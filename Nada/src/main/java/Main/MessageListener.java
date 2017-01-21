@@ -7,15 +7,10 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.StringTokenizer;
 
-import channelinstance.Absence;
-import channelinstance.Asking;
-import channelinstance.ChannelInstance;
-import channelinstance.MessageForYou;
-import data.Affinity;
-import data.Bank;
-import data.SurnameStorage;
-import jeux.DesFurieux;
-import jeux.Jeux;
+import channelinstance.*;
+import data.*;
+import jeux.*;
+
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -25,22 +20,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class MessageListener extends ListenerAdapter {
 
-	final static String[] greeting_soir = { "Bonsoir #NAME!", "Bienvenue #NAME.", "On attendait plus que toi!",
-			"Oh non pas lui.." };
-	final static String[] greeting_jour = { "Bonjour #NAME!", "Alors #NAME, on est matinal?", "*baille* 'Jour..",
-			"'Jour #NAME!" };
-	final static String[] greeting_nope = { "Salut #NAME!", "Heureux d'être accueilli par une magnifique pirate?",
-			"#NAME, tu tombes à pic, y a le pont à brosser!", "*sourire accueillant*" };
-	final static String[] answer_interpel = { "Mui?", "C'est moi.", "Héhé, en quoi puis-je t'aider?",
-			"Si c'est pour de l'argent, j'en ai que pour moi!" };
-	final static String[] asked_inexist = { "C'est indiscret #NAME.", "Eh bien.. mettons que j'ai une réponse!", ":3",
-			"Des fois, je me demande si Miss Fortune me cherche aussi",
-			"Demande à Jack Sombrebarbe. Il sait pas tout mais il te tuera peut-être pas.",
-			"C'est pas vrai, c'est pas moi, t'as pas de preuve! Tu voulais quoi déjà?" };
-	final static String[] greeting_not_jour = { "On vient tout juste de s'lever #NAME?",
-			"Hum.. Dois y avoir du décalage horaire avec Aranor.." };
-	final static String[] greeting_not_soir = { "Il n'est pas si tard que ça! Flemmard!",
-			"C'est déjà le matin tu sais?", "That's no moon... That is the sun boy!" };
+	
 
 	public HashMap<TextChannel, ChannelInstance> channelInstances;
 
@@ -62,6 +42,10 @@ public class MessageListener extends ListenerAdapter {
 
 		if (event.isFromType(ChannelType.PRIVATE)) {
 			System.out.printf("[PM] %s: %s\n", author.getName(), msg.getContent());
+			if(msg.getContent().toUpperCase().equals("TEST"))
+			{
+				event.getChannel().sendMessage(test(msg, author)).queue();
+			}
 		} else {
 			System.out.printf("[%s][%s] %s: %s\n", event.getGuild().getName(), channel.getName(),
 					event.getMember().getEffectiveName(), msg.getContent());
@@ -73,6 +57,7 @@ public class MessageListener extends ListenerAdapter {
 			HashMap<User, Asking> askings = channelInstances.get(channel).askings;
 			HashMap<User, MessageForYou> messages = channelInstances.get(channel).messages;
 			Jeux jeu = channelInstances.get(channel).jeu;
+			
 			if (!messages.isEmpty()) {
 				if (messages.get(author) != null) {
 					String str = "Hey " + getSurname(author, true) + "! "
@@ -306,23 +291,23 @@ public class MessageListener extends ListenerAdapter {
 		if (mode.i != 0 && heure != mode.i) {
 			switch (mode.i) {
 			case -1:
-				msg = getRdmSentence(greeting_not_soir, author);
+				msg = getRdmSentence(Sentences.greeting_not_soir, author);
 				break;
 			case 1:
-				msg = getRdmSentence(greeting_not_jour, author);
+				msg = getRdmSentence(Sentences.greeting_not_jour, author);
 			}
 
 			msg += " M'enfin bienvenue à bord!";
 		} else {
 			switch (heure) {
 			case -1:
-				msg = getRdmSentence(greeting_soir, author);
+				msg = getRdmSentence(Sentences.greeting_soir, author);
 				break;
 			case 0:
-				msg = getRdmSentence(greeting_nope, author);
+				msg = getRdmSentence(Sentences.greeting_nope, author);
 				break;
 			case 1:
-				msg = getRdmSentence(greeting_jour, author);
+				msg = getRdmSentence(Sentences.greeting_jour, author);
 			}
 		}
 
@@ -366,7 +351,7 @@ public class MessageListener extends ListenerAdapter {
 		else if (interpelationOnly(msg)) {
 			if (rand.nextInt(100) > 20) {
 				askings.put(author, new Asking(author, 1));
-				return getRdmSentence(answer_interpel, author);
+				return getRdmSentence(Sentences.answer_interpel, author);
 			} else {
 				if (author.getName().toUpperCase().equals("FENARO07")) {
 					askings.put(author, new Asking(author, 4, "FENARO"));
@@ -391,8 +376,10 @@ public class MessageListener extends ListenerAdapter {
 			if (rand.nextInt(100) > 75) {
 				Bank.retire(-1, author.getId());
 				answer = "*Prends pitié de " + getSurname(author, true) + " et lui donne 1 qual*";
-			} else
+			} else {
 				answer = "*pat pat " + getSurname(author, false) + "*";
+				Affinity.changeAfinity(3, author.getId());
+			}
 		} // Tu tournes
 		else if (msg.contains("TU TOURNES")) {
 			answer = "Cette fois, c'est pas pour moi! ;)";
@@ -442,13 +429,21 @@ public class MessageListener extends ListenerAdapter {
 				answer = "Je ne suis pas un robot! Mais tu peux essayer de me dire quand tu t'absentes, ou de me demander si quelqu'un est là, ou de dire à quelqu'un quelque chose, ou de me donner des idées de surnoms ou regarder plus haut ce que les autres ont fait :P";
 				return answer;
 			}
+			if(msg.contains("TU M'AIMES?") || msg.contains("TU M'AIMES ?")){
+				return Sentences.amour.getFromAffinity(Affinity.getAfinity(author.getId()));
+			}
+				
 
 			if (author.getName().toUpperCase().equals("THIBAULT")) {
 				answer = "Désolé mon petit chou, mais je n'ai pas encore de réponses :/";
 			} else
-				answer = getRdmSentence(asked_inexist, author);
+				answer = getRdmSentence(Sentences.asked_inexist, author);
 		} else if (msg.equals("RIEN"))
 			answer = "Ben m'embête pas alors!";
+		else if (msg.contains("J'AI UN CADEAU POUR TOI")){
+			String cadeau = searchSentenceAfter(message.getContent(), "TOI", null);
+			
+		}
 		 else
 			answer = "Hum, c'est intéressant..";
 
@@ -466,7 +461,7 @@ public class MessageListener extends ListenerAdapter {
 		case 0: {// Quel Nuha?
 			if ((msg.contains("TOI") || msg.contains("PIRATE")) && !msg.contains("PAS TOI")) {
 				ask.mode = 1;
-				return getRdmSentence(answer_interpel, message.getAuthor());
+				return getRdmSentence(Sentences.answer_interpel, message.getAuthor());
 			} else {
 				answer = "Ca ne me concerne pas alors.";
 			}
@@ -476,6 +471,7 @@ public class MessageListener extends ListenerAdapter {
 		case 1: { // Interpelation
 			if (msg.contains("TU TOURNES")) {
 				answer = "Mooo! *Tourne sur elle même en faisant la moue*";
+				Affinity.changeAfinity(-2, ask.author.getId());
 			} else {
 				askings.remove(ask.author);
 				return answer(ask.author, message, channel);
@@ -662,6 +658,10 @@ public class MessageListener extends ListenerAdapter {
 		}
 
 		return token;
+	}
+	
+	private String test(Message message, User author){		
+		return "Aucun test n'est en cours";
 	}
 
 }
