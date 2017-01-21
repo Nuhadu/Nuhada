@@ -263,9 +263,9 @@ public class DesFurieux extends Jeux {
 	@Override
 	public String receive(String message, User author) {
 		String msg = message.toUpperCase();
-		if (msg.equals("A BOIRE ET LE DIABLE AVAIT RÉGL�? LEUR SORT!")) {
+		if (msg.equals("A BOIRE ET LE DIABLE AVAIT RÉGLÉ LEUR SORT!")) {
 			if (!reussites[2].equals("")) {
-				return "Désolé " + author.getName() + ", " + reussites[2] + " t'as déj�? devancé!";
+				return "Désolé " + author.getName() + ", " + reussites[2] + " t'as déjà devancé!";
 			} else {
 				int j = 0;
 				for (int i = 0; i < 6; i++) {
@@ -273,7 +273,7 @@ public class DesFurieux extends Jeux {
 						j++;
 					if (j >= 2) {
 						reussites[2] += author.getName();
-						return "Félicitation tu es le premier �? l'avoir écrit!";
+						return "Félicitation tu es le premier à l'avoir écrit!";
 					}
 				}
 				fautes[2] += author.getName();
@@ -282,7 +282,7 @@ public class DesFurieux extends Jeux {
 		}
 		if (msg.startsWith("PRENDS")) {
 			if (pass[joueurs.indexOf(author)])
-				return "Désolé, " + author.getName() + " mais tu as déj�? dit que tu passais !";
+				return "Désolé, " + author.getName() + " mais tu as déjà dit que tu passais !";
 			StringTokenizer st = new StringTokenizer(message);
 			if (st.countTokens() >= 3) {
 				String token1 = st.nextToken();
@@ -314,7 +314,7 @@ public class DesFurieux extends Jeux {
 					}
 					return token1 + token2 + " " + token3.toLowerCase();
 				} else
-					return "Ce dé a déj�? été ramassé, dommage :/";
+					return "Ce dé a déjà été ramassé, dommage :/";
 			}
 		} else if (msg.equals("PASSE")) {
 			pass[joueurs.indexOf(author)] = true;
@@ -345,7 +345,7 @@ public class DesFurieux extends Jeux {
 	@Override
 	public boolean concerned(String message, User author) {
 		String msg = message.toUpperCase();
-		if (msg.contains("A BOIRE ET LE DIABLE AVAIT RÉGL�? LEUR SORT!"))
+		if (msg.contains("A BOIRE ET LE DIABLE AVAIT RÉGLÉ LEUR SORT!"))
 			return true;
 		if (msg.contains("PRENDS"))
 			return true;
