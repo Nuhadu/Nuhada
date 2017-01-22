@@ -10,6 +10,8 @@ import org.json.JSONTokener;
 
 public abstract class Affinity {
 	private final static String path = "src/txt/afinity.txt";
+	public final static int MAX_AFFINITY = 100;
+	public final static int MIN_AFFINITY = 0;
 
 	public static void initAfinity() {
 		File inputFile = new File(path);
@@ -35,7 +37,7 @@ public abstract class Affinity {
 			JSONTokener tk = new JSONTokener(in);
 			JSONObject json = new JSONObject(tk);
 
-			json.put(author, 0);
+			json.put(author, 50);
 			in.close();
 			update(json);
 
@@ -63,7 +65,7 @@ public abstract class Affinity {
 				json = new JSONObject(tk);
 			}
 
-			json.put(author, json.getInt(author) + i);
+			json.put(author, Math.min(MAX_AFFINITY,  Math.max(MIN_AFFINITY, json.getInt(author) + i)));
 			in.close();
 
 			update(json);
@@ -114,4 +116,6 @@ public abstract class Affinity {
 			e.printStackTrace();
 		}
 	}
+	
 }
+	
