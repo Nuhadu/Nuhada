@@ -174,42 +174,30 @@ public class MessageListener extends ListenerAdapter {
 			return true;
 		if (msg.equals("NUHADA"))
 			return true;
-		if (msg.equals("NUHA"))
-			return true;
 
 		if (msg.equals("NADA!"))
 			return true;
 		if (msg.equals("NUHADA!"))
-			return true;
-		if (msg.equals("NUHA!"))
 			return true;
 
 		if (msg.equals("NADA?"))
 			return true;
 		if (msg.equals("NUHADA?"))
 			return true;
-		if (msg.equals("NUHA?"))
-			return true;
 
 		if (msg.equals("NADA ?"))
 			return true;
 		if (msg.equals("NUHADA ?"))
-			return true;
-		if (msg.equals("NUHA ?"))
 			return true;
 
 		if (msg.equals("NADA !"))
 			return true;
 		if (msg.equals("NUHADA !"))
 			return true;
-		if (msg.equals("NUHA !"))
-			return true;
 		
 		if (msg.equals("NADA,"))
 			return true;
 		if (msg.equals("NUHADA,"))
-			return true;
-		if (msg.equals("NUHA,"))
 			return true;
 		
 		return false;
