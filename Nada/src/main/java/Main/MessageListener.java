@@ -101,12 +101,8 @@ public class MessageListener extends ListenerAdapter {
 				}
 			}
 			
-			if (concerned(msg, author, channel) && !hasBeenProcessed)
-				if (msg.getContent().toUpperCase().equals("NUHA")) {
-					event.getChannel().sendMessage("Lequel? La jolie pirate ou le loup mal peigné?").queue();
-					askings.put(author, new Asking(author, 0));
-				} else
-					event.getChannel().sendMessage(answer(author, msg, channel)).queue();
+			if (concerned(msg, author, channel) && !hasBeenProcessed)			
+				event.getChannel().sendMessage(answer(author, msg, channel)).queue();
 		}
 	}
 
