@@ -5,7 +5,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 import java.util.StringTokenizer;
-
 import Main.Mode;
 import channelinstance.Absence;
 import channelinstance.Asking;
@@ -48,9 +47,12 @@ public abstract class Sentences {
 	
 	public static String getAnswerCommand(Message message, User author, ChannelInstance instance){
 		String answer = "Hum, c'est intéressant..";
-		Command command =  Command.getCommand(message.getContent());
-		if(command == null)
+		Mode mode = new Mode(0);
+		Command command =  Command.getCommand(message.getContent(), mode);
+		if(command == null){			
 			return answer;
+		}
+		
 		switch(command){
 		case ABSENCE:
 			answer = absence(instance, author);
@@ -98,15 +100,18 @@ public abstract class Sentences {
 			answer = allSurnameOf(message.getMentionedUsers(), author);
 			break;
 		case BONJOUR:
-			answer = greeting(author, instance);
+			answer = greeting(message.getContent(), author, instance, mode);
 			break;
 		case INTERPEL:
 			answer = interpel(message.getContent(), author, instance);
 			break;
 		}
 		
+		
 		return answer;
 	}
+	
+	
 	
 	//CASE ABSENCE
 	private static String absence(ChannelInstance instance, User author){
@@ -245,15 +250,14 @@ public abstract class Sentences {
 	}
 	
 	//case greeting
-	private static String greeting(User author, ChannelInstance instance){		
-		Mode mode = new Mode(0);
+	private static String greeting(String content, User author, ChannelInstance instance, Mode mode){
 		String answer = greetingBack(author, mode);
 		instance.greated = true;
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					Thread.sleep(3600000);
+					Thread.sleep(2000000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -281,6 +285,9 @@ public abstract class Sentences {
 	}
 	
 	//###METHODS UTILS###
+	
+	
+	
 	private static String greetingBack(User author, Mode mode) {
 		String msg = "Bonjour";
 		Calendar cal = Calendar.getInstance();
@@ -315,7 +322,6 @@ public abstract class Sentences {
 				msg = Sentences.getRdmSentence(Sentences.greeting_jour, author);
 			}
 		}
-
 		return msg;
 	}
 	

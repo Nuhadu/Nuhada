@@ -59,8 +59,8 @@ public abstract class SurnameStorage {
 			JSONObject json = new JSONObject(tk);
 
 			if (!json.has(author)) {
-				addAuthor(author);
-				in.close();			
+				in.close();	
+				addAuthor(author);						
 				in = new FileReader(inputFile);
 				tk = new JSONTokener(in);
 				json = new JSONObject(tk);
@@ -90,12 +90,11 @@ public abstract class SurnameStorage {
 			{
 				in.close();	
 				addAuthor(author);
-				in = new FileReader(inputFile);
-				tk = new JSONTokener(in);
-				json = new JSONObject(tk);
 			}
-			str = json.getJSONArray(author).getString(rand.nextInt(json.getJSONArray(author).length()));
-			in.close();
+			else if(json.getJSONArray(author).length() > 0){
+				str = json.getJSONArray(author).getString(rand.nextInt(json.getJSONArray(author).length()));
+				in.close();
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -115,20 +114,18 @@ public abstract class SurnameStorage {
 
 			if (!json.has(author)) {
 				in.close();	
-				addAuthor(author);						
-				in = new FileReader(inputFile);
-				tk = new JSONTokener(in);
-				json = new JSONObject(tk);
+				addAuthor(author);
 			}
-			
-			Iterator<Object> it = json.getJSONArray(author).iterator();
-			
-			while(it.hasNext()){
-				if(!str.equals(""))
-					str += ", ";
-				str += it.next().toString();
-			}			
-			in.close();
+			else if(json.getJSONArray(author).length() > 0) {
+				Iterator<Object> it = json.getJSONArray(author).iterator();
+				
+				while(it.hasNext()){
+					if(!str.equals(""))
+						str += ", ";
+					str += it.next().toString();
+				}			
+				in.close();
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();

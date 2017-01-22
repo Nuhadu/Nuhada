@@ -3,7 +3,6 @@ package Main;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.StringTokenizer;
 
 import channelinstance.*;
 import data.*;
@@ -114,21 +113,13 @@ public class MessageListener extends ListenerAdapter {
 
 	private boolean concerned(Message message) {
 		String msg = message.getContent().toUpperCase();
-		if (Command.interpelationOnly(msg))
-			return true;
-		if (interpelation(msg))
+		if ( Command.isCommand( msg, channelInstances.get(message.getChannel()) ) )
 			return true;
 		if (emote(msg))
 			return true;
 		if (msg.contains("ARGENT"))
 			return true;
 		if (msg.contains("REINE"))
-			return true;
-		if (msg.contains("TU TOURNES"))
-			return true;
-		if (msg.contains("IL N'Y A PERSONNE?"))
-			return true;		
-		if (greeting(msg, new Mode(0)) && !greated)
 			return true;
 
 		return false;
@@ -144,87 +135,6 @@ public class MessageListener extends ListenerAdapter {
 
 		return bool && chance;
 	}
-
-	private boolean interpelation(String msg) {
-		String token = "";
-		StringTokenizer tk = new StringTokenizer(msg);
-		while (tk.hasMoreTokens()) {
-			token = tk.nextToken();
-			if (token.equals("NADA") || token.equals("NADA,"))
-				return true;
-			if (token.equals("NUHADA")|| token.equals("NUHADA,"))
-				return true;
-			if (token.equals("NUHA")|| token.equals("NUHA,"))
-				return true;
-
-		}
-		return false;
-	}
-
-	
-
-	private boolean greeting(String msg, Mode mode) {
-		String token = "";
-		StringTokenizer tk = new StringTokenizer(msg);
-		while (tk.hasMoreTokens()) {
-			token = tk.nextToken();
-			if (token.equals("BONJOUR")) {
-				mode.i = 1;
-				return true;
-			}
-			if (token.equals("BJR")) {
-				mode.i = 1;
-				return true;
-			}
-			if (token.equals("SALUT")) {
-				mode.i = 0;
-				return true;
-			}
-			if (token.equals("YO")) {
-				mode.i = 0;
-				return true;
-			}
-			if (token.equals("BONSOIR")) {
-				mode.i = -1;
-				return true;
-			}
-			if (token.equals("SOIR") && !msg.contains("CE SOIR") && !msg.contains("UN SOIR")) {
-				mode.i = -1;
-				return true;
-			}
-			if (token.equals("'SOIR")) {
-				mode.i = -1;
-				return true;
-			}
-			if (token.equals("HELLO")) {
-				mode.i = 0;
-				return true;
-			}
-			if (token.equals("OHAYO")) {
-				mode.i = 1;
-				return true;
-			}
-			if (token.equals("JOUR") && !msg.contains("CE JOUR") && !msg.contains("UN JOUR")) {
-				mode.i = 1;
-				return true;
-			}
-			if (token.equals("'JOUR")) {
-				mode.i = 1;
-				return true;
-			}
-			if (token.equals("KIKOU")) {
-				mode.i = 0;
-				return true;
-			}
-			if (token.equals("YOSHA")) {
-				mode.i = 0;
-				return true;
-			}
-		}
-		return false;
-	}
-
-	
 
 	private String answer(User author, Message message, TextChannel channel) {
 				
