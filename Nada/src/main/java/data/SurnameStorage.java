@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Random;
 
 import org.json.JSONArray;
@@ -59,7 +60,7 @@ public abstract class SurnameStorage {
 	}
 
 	public static String getSurname(String author) {
-		String str = author;
+		String str = "";
 		Random rand = new Random();
 		File inputFile = new File(path);
 		FileReader in;
@@ -69,9 +70,41 @@ public abstract class SurnameStorage {
 
 			JSONObject json = new JSONObject(tk);
 
-			if (json.has(author)) {
-				str = json.getJSONArray(author).getString(rand.nextInt(json.getJSONArray(author).length()));
+			if (!json.has(author))
+			{
+				json.put(author, new JSONArray());
 			}
+			str = json.getJSONArray(author).getString(rand.nextInt(json.getJSONArray(author).length()));
+			in.close();
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return str;
+	}
+	
+	public static String getAllSurname(String author) {
+		String str = "";
+		File inputFile = new File(path);
+		FileReader in;
+		try {
+			in = new FileReader(inputFile);
+			JSONTokener tk = new JSONTokener(in);
+
+			JSONObject json = new JSONObject(tk);
+
+			if (!json.has(author)) {
+				json.put(author, new JSONArray());
+			}
+			Iterator<Object> it = json.getJSONArray(author).iterator();
+			
+			while(it.hasNext()){
+				if(!str.equals(""))
+					str += ", ";
+				str += it.next().toString();
+			}			
 			in.close();
 
 		} catch (FileNotFoundException e) {

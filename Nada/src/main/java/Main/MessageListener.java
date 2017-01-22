@@ -394,7 +394,21 @@ public class MessageListener extends ListenerAdapter {
 				SurnameStorage.addSurname(surnom, dest.getId());
 			}
 			return "Oki doki, ça marche !";
-		} else if (msg.endsWith("?")) {
+		} else if (msg.contains("TOUT LES SURNOMS DE")){
+			if (message.getMentionedUsers().size() != 1) {
+				if (message.getMentionedUsers().size() > 1)
+					return "Hé oh! Un à la fois! J'suis pas un perroquet!";
+				else
+					return "C'est bien beau tout ça, mais je sais pas pour qui c'est.";
+			} else {
+				User dest = message.getMentionedUsers().get(0);
+				String str = SurnameStorage.getAllSurname(author.getId());
+				if(str.equals(""))
+					return "Il n'en a pas encore et c'est bien dommage!";
+				else
+					return "Alors il y a: " + str +".";
+			}
+		}else if (msg.endsWith("?")) {
 			// question thibault
 			if (msg.contains("ÇA VA?") || msg.contains("CA VA ?")) {
 				askings.put(author, new Asking(author, 4, "CAVA"));
