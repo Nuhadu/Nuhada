@@ -333,7 +333,120 @@ public class MessageListener extends ListenerAdapter {
 					greated = false;
 				}
 			}).start();
+<<<<<<< HEAD
 			return answer;
+=======
+		} // Nada
+		else if (interpelationOnly(msg)) {
+			if (rand.nextInt(100) > 20) {
+				askings.put(author, new Asking(author, 1));
+				return getRdmSentence(Sentences.answer_interpel, author);
+			} else {
+				if (author.getName().toUpperCase().equals("FENARO07")) {
+					askings.put(author, new Asking(author, 4, "FENARO"));
+					return "On m'a dit que tu avais une arme à feu entre les jambes. C'est vrai?";
+				}
+				answer = "Non. *Tire la langue*";
+			}
+
+		} // Quelqu'un?
+		else if (msg.contains("IL N'Y A PERSONNE?")) {
+			if (absences.isEmpty()) {
+				answer = "Il y a moi!";
+			} else {
+				answer = "Pour l'instant que moi mais";
+				for (Absence abs : absences.values()) {
+					answer += "\n" + abs;
+				}
+				answer += " \nVoilà, ça fera " + 30 * absences.size() + " quals.";
+			}
+		} // T.T
+		else if (msg.contains("T.T")) {
+			if (rand.nextInt(100) > 75) {
+				Bank.retire(-1, author.getId());
+				answer = "*Prends pitié de " + getSurname(author, true) + " et lui donne 1 qual*";
+			} else {
+				answer = "*pat pat " + getSurname(author, false) + "*";
+				Affinity.changeAfinity(3, author.getId());
+			}
+		} // Tu tournes
+		else if (msg.contains("TU TOURNES")) {
+			answer = "Cette fois, c'est pas pour moi! ;)";
+		} // Jeu
+		else if (msg.contains("PARTIE DE DÉS")) {
+			askings.put(author, new Asking(author, 2));
+			return "C'est partis pour les dés de la mort! Qui joue?";
+		} // Absence
+		else if (msg.contains("JE M'ABSENTE")) {
+			if (askings.get(author) != null)
+				if (askings.get(author).var.equals("THIRD"))
+					return "Mais c'était inutile de revenir X)";
+			askings.put(author, new Asking(author, 3));
+			absences.put(author, new Absence(author));
+			return "Oh :/ pourquoi?";
+		} else if (msg.contains("NOUVEAU SURNOM POUR")) {
+			if (message.getMentionedUsers().size() != 1) {
+				if (msg.contains("NOUVEAU SURNOM POUR ALL")) {
+					String surnom = searchSentenceAfter(message.getContent(), "ALL", null);
+					SurnameStorage.addSurname(surnom, "ALL");
+				} else if (message.getMentionedUsers().size() > 1)
+					return "Hé oh! Un à la fois! J'suis pas un perroquet!";
+				else
+					return "C'est bien beau tout ça, mais je sais pas pour qui c'est.";
+			} else {
+				User dest = message.getMentionedUsers().get(0);
+				String surnom = searchSentenceAfter(message.getContent(), "POUR", dest);
+				SurnameStorage.addSurname(surnom, dest.getId());
+			}
+			return "Oki doki, ça marche !";
+		} else if (msg.contains("TOUT LES SURNOMS DE")){
+			if (message.getMentionedUsers().size() != 1) {
+				if (message.getMentionedUsers().size() > 1)
+					return "Hé oh! Un à la fois! J'suis pas un perroquet!";
+				else
+					return "C'est bien beau tout ça, mais je sais pas pour qui c'est.";
+			} else {
+				User dest = message.getMentionedUsers().get(0);
+				String str = SurnameStorage.getAllSurname(dest.getId());
+				if(str.equals(""))
+					return "Il n'en a pas encore et c'est bien dommage!";
+				else
+					return "Alors il y a: " + str +".";
+			}
+		}else if (msg.endsWith("?")) {
+			// question thibault
+			if (msg.contains("ÇA VA?") || msg.contains("CA VA ?")) {
+				askings.put(author, new Asking(author, 4, "CAVA"));
+				return "Ça va et toi?";
+			}
+			if (msg.contains("COMBIEN J'AI?") || msg.equals("COMBIEN J'AI ?")) {
+				
+				answer = "Tu as " + Bank.getSolde(author.getId()) + " quals.";
+				if (rand.nextInt(100) > 75){
+					answer += " quals. Tu m'en donnes un?";
+					askings.put(author, new Asking(author, 4, "COMBIEN"));
+				}
+				return answer;
+			}
+			if(msg.contains("COMMANDES?") || msg.contains("COMMANDES ?")){
+				answer = "Je ne suis pas un robot! Mais tu peux essayer de me dire quand tu t'absentes, ou de me demander si quelqu'un est là, ou de dire à quelqu'un quelque chose, ou de me donner des idées de surnoms ou regarder plus haut ce que les autres ont fait :P";
+				return answer;
+			}
+			if(msg.contains("TU M'AIMES?") || msg.contains("TU M'AIMES ?")){
+				return Sentences.amour.getFromAffinity(Affinity.getAfinity(author.getId()));
+			}
+				
+
+			if (author.getName().toUpperCase().equals("THIBAULT")) {
+				answer = "Désolé mon petit chou, mais je n'ai pas encore de réponses :/";
+			} else
+				answer = getRdmSentence(Sentences.asked_inexist, author);
+		} else if (msg.equals("RIEN"))
+			answer = "Ben m'embête pas alors!";
+		else if (msg.contains("J'AI UN CADEAU POUR TOI")){
+			String cadeau = searchSentenceAfter(message.getContent(), "TOI", null);
+			
+>>>>>>> refs/remotes/origin/master
 		}
 			
 		String answer = Sentences.getAnswerCommand(message, author, channelInstances.get(channel));
