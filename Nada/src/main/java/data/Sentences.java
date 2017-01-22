@@ -244,9 +244,12 @@ public abstract class Sentences {
 		return replaceTag(sentences[rand.nextInt(sentences.length)], destinataire);
 	}
 	
-	private static String replaceTag(String str, User destinataire) {
-		String result =  str.replace("#NAME", getSurname(destinataire, true));
-		result = result.replace("#SOLDE", "" +Bank.getSolde(destinataire.getId()));
+	private static String replaceTag(final String str, User destinataire) {
+		String result = ""+str;
+		if(str.contains("#NAME"))
+			result =  str.replace("#NAME", getSurname(destinataire, true));
+		if(str.contains("#SOLDE"))
+			result = result.replace("#SOLDE", "" +Bank.getSolde(destinataire.getId()));
 		return result;
 	}
 	

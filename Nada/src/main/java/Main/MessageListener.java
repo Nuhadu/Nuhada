@@ -334,11 +334,26 @@ public class MessageListener extends ListenerAdapter {
 				}
 			}).start();
 			return answer;
+		} // Nada
+		else if (interpelationOnly(msg)) {
+			if (rand.nextInt(100) > 20) {
+				askings.put(author, new Asking(author, 1));
+				return Sentences.getRdmSentence(Sentences.answer_interpel, author);
+			} else {
+				if (author.getName().toUpperCase().equals("FENARO07")) {
+					askings.put(author, new Asking(author, 4, "FENARO"));
+					return "On m'a dit que tu avais une arme à feu entre les jambes. C'est vrai?";
+				}
+				return "Non. *Tire la langue*";
+			}
+
 		}
+		
 			
 		String answer = Sentences.getAnswerCommand(message, author, channelInstances.get(channel));
 		if( answer.equals(""))
 			return "Oups, pas de réponses";
+		
 		return answer;		
 	}
 

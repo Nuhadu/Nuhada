@@ -1,7 +1,6 @@
 package data;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -30,12 +29,29 @@ public abstract class SurnameStorage {
 			e.printStackTrace();
 		}
 	}
+	
+	private static void addAuthor(String author) {
+		File inputFile = new File(path);
+
+		FileReader in;
+		try {
+			in = new FileReader(inputFile);
+			JSONTokener tk = new JSONTokener(in);
+			JSONObject json = new JSONObject(tk);
+
+			json.put(author, new JSONArray());
+			in.close();
+			update(json);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	public static void addSurname(String str, String author) {
 		File inputFile = new File(path);
 
 		FileReader in;
-		FileWriter out;
 		try {
 			in = new FileReader(inputFile);
 			JSONTokener tk = new JSONTokener(in);
@@ -43,18 +59,18 @@ public abstract class SurnameStorage {
 			JSONObject json = new JSONObject(tk);
 
 			if (!json.has(author)) {
-				json.put(author, new JSONArray());
+				addAuthor(author);
+				in.close();			
+				in = new FileReader(inputFile);
+				tk = new JSONTokener(in);
+				json = new JSONObject(tk);
 			}
 
 			json.getJSONArray(author).put(str);
 			in.close();
-			out = new FileWriter(inputFile);
-			json.write(out);
-			out.close();
+			update(json);
 
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -72,14 +88,16 @@ public abstract class SurnameStorage {
 
 			if (!json.has(author))
 			{
-				json.put(author, new JSONArray());
+				in.close();	
+				addAuthor(author);
+				in = new FileReader(inputFile);
+				tk = new JSONTokener(in);
+				json = new JSONObject(tk);
 			}
 			str = json.getJSONArray(author).getString(rand.nextInt(json.getJSONArray(author).length()));
 			in.close();
 
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return str;
@@ -96,8 +114,13 @@ public abstract class SurnameStorage {
 			JSONObject json = new JSONObject(tk);
 
 			if (!json.has(author)) {
-				json.put(author, new JSONArray());
+				in.close();	
+				addAuthor(author);						
+				in = new FileReader(inputFile);
+				tk = new JSONTokener(in);
+				json = new JSONObject(tk);
 			}
+			
 			Iterator<Object> it = json.getJSONArray(author).iterator();
 			
 			while(it.hasNext()){
@@ -107,11 +130,21 @@ public abstract class SurnameStorage {
 			}			
 			in.close();
 
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return str;
+	}
+	
+	public static void update(JSONObject json) {
+		File inputFile = new File(path);
+		FileWriter out;
+		try {
+			out = new FileWriter(inputFile);
+			json.write(out);
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
