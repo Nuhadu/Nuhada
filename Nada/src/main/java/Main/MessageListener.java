@@ -402,7 +402,7 @@ public class MessageListener extends ListenerAdapter {
 					return "C'est bien beau tout ça, mais je sais pas pour qui c'est.";
 			} else {
 				User dest = message.getMentionedUsers().get(0);
-				String str = SurnameStorage.getAllSurname(author.getId());
+				String str = SurnameStorage.getAllSurname(dest.getId());
 				if(str.equals(""))
 					return "Il n'en a pas encore et c'est bien dommage!";
 				else
