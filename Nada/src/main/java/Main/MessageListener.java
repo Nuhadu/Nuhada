@@ -60,8 +60,8 @@ public class MessageListener extends ListenerAdapter {
 			
 			if (!messages.isEmpty()) {
 				if (messages.get(author) != null) {
-					String str = "Hey " + getSurname(author, true) + "! "
-							+ getSurname(messages.get(author).author, false) + " te dit : "
+					String str = "Hey " + Sentences.getSurname(author, true) + "! "
+							+ Sentences.getSurname(messages.get(author).author, false) + " te dit : "
 							+ messages.get(author).message;
 					event.getChannel().sendMessage(str).queue();
 					messages.remove(author);
@@ -86,9 +86,9 @@ public class MessageListener extends ListenerAdapter {
 						ArrayList<User> users = channelInstances.get(channel).users;
 						if(!users.contains(author)){
 							users.add(author);
-							str = "Je t'ajoute " + getSurname(author, false) +".";
+							str = "Je t'ajoute " + Sentences.getSurname(author, false) +".";
 						} else
-							str = "Tu as déjà été ajouté " + getSurname(author, false) + ".";
+							str = "Tu as déjà été ajouté " + Sentences.getSurname(author, false) + ".";
 						event.getChannel().sendMessage(str).queue();
 					}
 			}
@@ -275,23 +275,23 @@ public class MessageListener extends ListenerAdapter {
 		if (mode.i != 0 && heure != mode.i) {
 			switch (mode.i) {
 			case -1:
-				msg = getRdmSentence(Sentences.greeting_not_soir, author);
+				msg = Sentences.getRdmSentence(Sentences.greeting_not_soir, author);
 				break;
 			case 1:
-				msg = getRdmSentence(Sentences.greeting_not_jour, author);
+				msg = Sentences.getRdmSentence(Sentences.greeting_not_jour, author);
 			}
 
 			msg += " M'enfin bienvenue à bord!";
 		} else {
 			switch (heure) {
 			case -1:
-				msg = getRdmSentence(Sentences.greeting_soir, author);
+				msg = Sentences.getRdmSentence(Sentences.greeting_soir, author);
 				break;
 			case 0:
-				msg = getRdmSentence(Sentences.greeting_nope, author);
+				msg = Sentences.getRdmSentence(Sentences.greeting_nope, author);
 				break;
 			case 1:
-				msg = getRdmSentence(Sentences.greeting_jour, author);
+				msg = Sentences.getRdmSentence(Sentences.greeting_jour, author);
 			}
 		}
 
@@ -299,25 +299,27 @@ public class MessageListener extends ListenerAdapter {
 	}
 
 	private String answer(User author, Message message, TextChannel channel) {
-		HashMap<User, Asking> askings = channelInstances.get(channel).askings;
-		HashMap<User, Absence> absences = channelInstances.get(channel).absences;
-		HashMap<User, MessageForYou> messages = channelInstances.get(channel).messages;
+		
 		String msg = message.getContent().toUpperCase();
-		String answer = "Hum..";
-		Mode mode = new Mode(0);
 		Random rand = new Random();
-
-		// BONJOUR
-		if (msg.contains("DIS À")) {
-			if (message.getMentionedUsers().size() != 1) {
-				return "Il m'faut un unique destinataire. J'suis pas un pigeon voyageur magique";
+		HashMap<User, Asking> askings = channelInstances.get(channel).askings;
+		if (interpelationOnly(msg)) {
+			if (rand.nextInt(100) > 20) {
+				askings.put(author, new Asking(author, 1));
+				return Sentences.getRdmSentence(Sentences.answer_interpel, author);
+			} else {
+				if (author.getName().toUpperCase().equals("FENARO07")) {
+					askings.put(author, new Asking(author, 4, "FENARO"));
+					return "On m'a dit que tu avais une arme à feu entre les jambes. C'est vrai?";
+				}
+				return "Non. *Tire la langue*";
 			}
 
-			User dest = message.getMentionedUsers().get(0);
-			String sentence = searchSentenceAfter(message.getContent(), "À", dest);
-			messages.put(dest, new MessageForYou(author, sentence));
-			return "C'est noté, je lui dirai.";
-		} else if (greeting(message.getContent().toUpperCase(), mode)) {
+		} 
+		
+		Mode mode = new Mode(0);
+		if (greeting(message.getContent().toUpperCase(), mode)) {
+			String answer = "";			
 			answer = greetingBack(author, mode);
 			greated = true;
 			new Thread(new Runnable() {
@@ -331,107 +333,13 @@ public class MessageListener extends ListenerAdapter {
 					greated = false;
 				}
 			}).start();
-		} // Nada
-		else if (interpelationOnly(msg)) {
-			if (rand.nextInt(100) > 20) {
-				askings.put(author, new Asking(author, 1));
-				return getRdmSentence(Sentences.answer_interpel, author);
-			} else {
-				if (author.getName().toUpperCase().equals("FENARO07")) {
-					askings.put(author, new Asking(author, 4, "FENARO"));
-					return "On m'a dit que tu avais une arme à feu entre les jambes. C'est vrai?";
-				}
-				answer = "Non. *Tire la langue*";
-			}
-
-		} // Quelqu'un?
-		else if (msg.contains("IL N'Y A PERSONNE?")) {
-			if (absences.isEmpty()) {
-				answer = "Il y a moi!";
-			} else {
-				answer = "Pour l'instant que moi mais";
-				for (Absence abs : absences.values()) {
-					answer += "\n" + abs;
-				}
-				answer += " \nVoilà, ça fera " + 30 * absences.size() + " quals.";
-			}
-		} // T.T
-		else if (msg.contains("T.T")) {
-			if (rand.nextInt(100) > 75) {
-				Bank.retire(-1, author.getId());
-				answer = "*Prends pitié de " + getSurname(author, true) + " et lui donne 1 qual*";
-			} else {
-				answer = "*pat pat " + getSurname(author, false) + "*";
-				Affinity.changeAfinity(3, author.getId());
-			}
-		} // Tu tournes
-		else if (msg.contains("TU TOURNES")) {
-			answer = "Cette fois, c'est pas pour moi! ;)";
-		} // Jeu
-		else if (msg.contains("PARTIE DE DÉS")) {
-			askings.put(author, new Asking(author, 2));
-			return "C'est partis pour les dés de la mort! Qui joue?";
-		} // Absence
-		else if (msg.contains("JE M'ABSENTE")) {
-			if (askings.get(author) != null)
-				if (askings.get(author).var.equals("THIRD"))
-					return "Mais c'était inutile de revenir X)";
-			askings.put(author, new Asking(author, 3));
-			absences.put(author, new Absence(author));
-			return "Oh :/ pourquoi?";
-		} else if (msg.contains("NOUVEAU SURNOM POUR")) {
-			if (message.getMentionedUsers().size() != 1) {
-				if (msg.contains("NOUVEAU SURNOM POUR ALL")) {
-					String surnom = searchSentenceAfter(message.getContent(), "ALL", null);
-					SurnameStorage.addSurname(surnom, "ALL");
-				} else if (message.getMentionedUsers().size() > 1)
-					return "Hé oh! Un à la fois! J'suis pas un perroquet!";
-				else
-					return "C'est bien beau tout ça, mais je sais pas pour qui c'est.";
-			} else {
-				User dest = message.getMentionedUsers().get(0);
-				String surnom = searchSentenceAfter(message.getContent(), "POUR", dest);
-				SurnameStorage.addSurname(surnom, dest.getId());
-			}
-			return "Oki doki, ça marche !";
-		} else if (msg.endsWith("?")) {
-			// question thibault
-			if (msg.contains("ÇA VA?") || msg.contains("CA VA ?")) {
-				askings.put(author, new Asking(author, 4, "CAVA"));
-				return "Ça va et toi?";
-			}
-			if (msg.contains("COMBIEN J'AI?") || msg.equals("COMBIEN J'AI ?")) {
-				
-				answer = "Tu as " + Bank.getSolde(author.getId()) + " quals.";
-				if (rand.nextInt(100) > 75){
-					answer += " quals. Tu m'en donnes un?";
-					askings.put(author, new Asking(author, 4, "COMBIEN"));
-				}
-				return answer;
-			}
-			if(msg.contains("COMMANDES?") || msg.contains("COMMANDES ?")){
-				answer = "Je ne suis pas un robot! Mais tu peux essayer de me dire quand tu t'absentes, ou de me demander si quelqu'un est là, ou de dire à quelqu'un quelque chose, ou de me donner des idées de surnoms ou regarder plus haut ce que les autres ont fait :P";
-				return answer;
-			}
-			if(msg.contains("TU M'AIMES?") || msg.contains("TU M'AIMES ?")){
-				return Sentences.amour.getFromAffinity(Affinity.getAfinity(author.getId()));
-			}
-				
-
-			if (author.getName().toUpperCase().equals("THIBAULT")) {
-				answer = "Désolé mon petit chou, mais je n'ai pas encore de réponses :/";
-			} else
-				answer = getRdmSentence(Sentences.asked_inexist, author);
-		} else if (msg.equals("RIEN"))
-			answer = "Ben m'embête pas alors!";
-		else if (msg.contains("J'AI UN CADEAU POUR TOI")){
-			String cadeau = searchSentenceAfter(message.getContent(), "TOI", null);
-			
+			return answer;
 		}
-		 else
-			answer = "Hum, c'est intéressant..";
-
-		return answer;
+			
+		String answer = Sentences.getAnswerCommand(message, author, channelInstances.get(channel));
+		if( answer.equals(""))
+			return "Oups, pas de réponses";
+		return answer;		
 	}
 
 	private String asking(Asking ask, Message message, TextChannel channel) {
@@ -442,14 +350,8 @@ public class MessageListener extends ListenerAdapter {
 		String answer = "";
 
 		switch (ask.mode) {
-		case 0: {// Quel Nuha?
-			if ((msg.contains("TOI") || msg.contains("PIRATE")) && !msg.contains("PAS TOI")) {
-				ask.mode = 1;
-				return getRdmSentence(Sentences.answer_interpel, message.getAuthor());
-			} else {
-				answer = "Ca ne me concerne pas alors.";
-			}
-
+		case 0: {// Open
+			
 		}
 			break;
 		case 1: { // Interpelation
@@ -479,7 +381,7 @@ public class MessageListener extends ListenerAdapter {
 				} else if(msg.equals("MOI")){
 					answer += "J'ai les joueurs:";
 					for (User user : users)
-						answer += " " + getSurname(user, false);
+						answer += " " + Sentences.getSurname(user, false);
 					return answer += "\n Go?";
 				} else {
 					if (message.getMentionedUsers().size() < 1)
@@ -492,7 +394,7 @@ public class MessageListener extends ListenerAdapter {
 					}
 					answer += "J'ai les joueurs:";
 					for (User user : users)
-						answer += " " + getSurname(user, false);
+						answer += " " + Sentences.getSurname(user, false);
 					return answer += "\n Go?";
 				}
 			}
@@ -520,10 +422,10 @@ public class MessageListener extends ListenerAdapter {
 			} else if (ask.var.contains("THIRD")) {
 				absences.remove(ask.author);
 				if (ask.var.contains("BAD"))
-					answer = "*Tire une balle dans le coeur de " + getSurname(ask.author, false)
+					answer = "*Tire une balle dans le coeur de " + Sentences.getSurname(ask.author, false)
 							+ "* \n Fallait t'en tenir à ta parole.";
 				else {
-					answer = "Bon retour " + getSurname(ask.author, true) + "!";
+					answer = "Bon retour " + Sentences.getSurname(ask.author, true) + "!";
 					answer += "\n" + answer(ask.author, message, channel);
 				}
 			}
@@ -590,62 +492,11 @@ public class MessageListener extends ListenerAdapter {
 		return answer;
 	}
 
-	private String getSurname(User author, boolean canAll) {
-		Random rand = new Random();
-		String str = "";
-		switch (rand.nextInt(4)) {
-		case 0:
-			str = author.getName();
-			break;
-		case 1:
-		case 2:
-			if (canAll)
-				str = SurnameStorage.getSurname("ALL");
-			break;
-		default:
-			str = SurnameStorage.getSurname(author.getId());
-		}
-		if (str.equals(""))
-			return author.getName();
-		return str;
-	}
-
-	private String getRdmSentence(String[] sentences, User destinataire) {
-		Random rand = new Random();
-		return replaceTag(sentences[rand.nextInt(sentences.length)], destinataire);
-	}
-
-	private String replaceTag(String str, User destinataire) {
-		return str.replace("#NAME", getSurname(destinataire, true));
-	}
-
-	private String searchSentenceAfter(String message, String lastWord, User tag) {
-		StringTokenizer st = new StringTokenizer(message);
-		String token = "";
-		// on avance jusqu'au dernier mot
-		while (!token.toUpperCase().equals(lastWord) && st.hasMoreTokens()) {
-			token = st.nextToken();
-		}
-
-		// on passe le nom s'il y en a un
-		if (tag != null) {
-			StringTokenizer st2 = new StringTokenizer(tag.getName());
-			for (int i = 0; i < st2.countTokens() && st.hasMoreTokens(); i++) {
-				st.nextToken();
-			}
-		}
-
-		// on rassemble le reste.
-		token = "";
-		while (st.hasMoreTokens()) {
-			token += st.nextToken() + " ";
-		}
-
-		return token;
-	}
 	
 	private String test(Message message, User author){		
 		return "Aucun test n'est en cours";
 	}
+	
+
 
 }
