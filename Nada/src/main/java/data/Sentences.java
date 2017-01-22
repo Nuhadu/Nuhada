@@ -32,15 +32,18 @@ public abstract class Sentences {
 	private final static String RIEN = "Ben m'embête pas alors!";
 	private final static String ALLSURNAME_NONE = "Il n'en a pas encore et c'est bien dommage!";
 	private final static String ALLSURNAME_ILYA = "Alors il y a: ";
+	private final static String INTERPEL_NO = "Non. *Tire la langue*";
+	private final static String INTERPEL_FENARO = "On m'a dit que tu avais une arme à feu entre les jambes. C'est vrai?";
+	private final static String GREETINGBACK_MENFIN = " M'enfin bienvenue à bord!";
 	
 	public final static String[] DEST_TROP =  {"Il m'faut un unique destinataire. J'suis pas un pigeon voyageur magique", "Hé oh! Un à la fois! J'suis pas un perroquet!"};
-	public final static String[] greeting_soir = { "Bonsoir #NAME!", "Bienvenue #NAME.", "On attendait plus que toi!","Oh non pas lui.." };
-	public final static String[] greeting_jour = { "Bonjour #NAME!", "Alors #NAME, on est matinal?", "*baille* 'Jour..","'Jour #NAME!" };
-	public final static String[] greeting_nope = { "Salut #NAME!", "Heureux d'être accueilli par une magnifique pirate?","#NAME, tu tombes à pic, y a le pont à brosser!", "*sourire accueillant*" };
-	public final static String[] answer_interpel = { "Mui?", "C'est moi.", "Héhé, en quoi puis-je t'aider?","Si c'est pour de l'argent, j'en ai que pour moi!" };
-	public final static String[] asked_inexist = { "C'est indiscret #NAME.", "Eh bien.. mettons que j'ai une réponse!", ":3","Des fois, je me demande si Miss Fortune me cherche aussi","Demande à Jack Sombrebarbe. Il sait pas tout mais il te tuera peut-être pas.","C'est pas vrai, c'est pas moi, t'as pas de preuve! Tu voulais quoi déjà?" };
-	public final static String[] greeting_not_jour = { "On vient tout juste de s'lever #NAME?","Hum.. Dois y avoir du décalage horaire avec Aranor.." };
-	public final static String[] greeting_not_soir = { "Il n'est pas si tard que ça! Flemmard!","C'est déjà le matin tu sais?", "That's no moon... That is the sun boy!" };
+	public final static String[] GREETING_SOIR = { "Bonsoir #NAME!", "Bienvenue #NAME.", "On attendait plus que toi!","Oh non pas lui.." };
+	public final static String[] GREETING_JOUR = { "Bonjour #NAME!", "Alors #NAME, on est matinal?", "*baille* 'Jour..","'Jour #NAME!" };
+	public final static String[] GREETING_NOPE = { "Salut #NAME!", "Heureux d'être accueilli par une magnifique pirate?","#NAME, tu tombes à pic, y a le pont à brosser!", "*sourire accueillant*" };
+	public final static String[] ANSWER_INTERPEL = { "Mui?", "C'est moi.", "Héhé, en quoi puis-je t'aider?","Si c'est pour de l'argent, j'en ai que pour moi!" };
+	public final static String[] ASKED_INEXIST = { "C'est indiscret #NAME.", "Eh bien.. mettons que j'ai une réponse!", ":3","Des fois, je me demande si Miss Fortune me cherche aussi","Demande à Jack Sombrebarbe. Il sait pas tout mais il te tuera peut-être pas.","C'est pas vrai, c'est pas moi, t'as pas de preuve! Tu voulais quoi déjà?" };
+	public final static String[] GREETING_NOT_JOUR = { "On vient tout juste de s'lever #NAME?","Hum.. Dois y avoir du décalage horaire avec Aranor.." };
+	public final static String[] GREETING_NOT_SOIR = { "Il n'est pas si tard que ça! Flemmard!","C'est déjà le matin tu sais?", "That's no moon... That is the sun boy!" };
 	
 	public final static AffinitySelector amour = new AffinitySelector( new String[]{"Haha!", "Aimer? On a pris la peine de t'apprendre ce verbre?", "Hum.. offre moi des quals, on en reparlera", "Pas encore", "Peut-être", "J't'aime bien", "Je t'adore!", "Faut-il être aveugle pour en douter? Crétin"});
 	
@@ -156,7 +159,7 @@ public abstract class Sentences {
 	
 	//CASE QUESTION
 	private static String question(User author){
-		return getRdmSentence(Sentences.asked_inexist, author);
+		return getRdmSentence(ASKED_INEXIST, author);
 	}
 	
 	//CASE SURNOM
@@ -274,13 +277,13 @@ public abstract class Sentences {
 		Random rand = new Random();
 		if (rand.nextInt(100) > 20) {
 			instance.askings.put(author, new Asking(author, 1));
-			return Sentences.getRdmSentence(Sentences.answer_interpel, author);
+			return getRdmSentence(ANSWER_INTERPEL, author);
 		} else {
 			if (author.getName().toUpperCase().equals("FENARO07")) {
 				instance.askings.put(author, new Asking(author, 4, "FENARO"));
-				return "On m'a dit que tu avais une arme à feu entre les jambes. C'est vrai?";
+				return INTERPEL_FENARO;
 			}
-			return "Non. *Tire la langue*";
+			return INTERPEL_NO;
 		}
 	}
 	
@@ -303,23 +306,23 @@ public abstract class Sentences {
 		if (mode.i != 0 && heure != mode.i) {
 			switch (mode.i) {
 			case -1:
-				msg = Sentences.getRdmSentence(Sentences.greeting_not_soir, author);
+				msg = getRdmSentence(GREETING_NOT_SOIR, author);
 				break;
 			case 1:
-				msg = Sentences.getRdmSentence(Sentences.greeting_not_jour, author);
+				msg = getRdmSentence(GREETING_NOT_JOUR, author);
 			}
 
-			msg += " M'enfin bienvenue à bord!";
+			msg += GREETINGBACK_MENFIN;
 		} else {
 			switch (heure) {
 			case -1:
-				msg = Sentences.getRdmSentence(Sentences.greeting_soir, author);
+				msg = getRdmSentence(GREETING_SOIR, author);
 				break;
 			case 0:
-				msg = Sentences.getRdmSentence(Sentences.greeting_nope, author);
+				msg = getRdmSentence(GREETING_NOPE, author);
 				break;
 			case 1:
-				msg = Sentences.getRdmSentence(Sentences.greeting_jour, author);
+				msg = getRdmSentence(GREETING_JOUR, author);
 			}
 		}
 		return msg;
