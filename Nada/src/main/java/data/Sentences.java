@@ -1,9 +1,12 @@
 package data;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 import java.util.StringTokenizer;
 
+import Main.Mode;
 import channelinstance.Absence;
 import channelinstance.Asking;
 import channelinstance.ChannelInstance;
@@ -93,7 +96,13 @@ public abstract class Sentences {
 			break;
 		case ALLSURNAME:
 			answer = allSurnameOf(message.getMentionedUsers(), author);
-			break;	
+			break;
+		case BONJOUR:
+			answer = greeting(author, instance);
+			break;
+		case INTERPEL:
+			answer = interpel(message.getContent(), author, instance);
+			break;
 		}
 		
 		return answer;
@@ -235,10 +244,83 @@ public abstract class Sentences {
 		
 	}
 	
+	//case greeting
+	private static String greeting(User author, ChannelInstance instance){		
+		Mode mode = new Mode(0);
+		String answer = greetingBack(author, mode);
+		instance.greated = true;
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(3600000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				instance.greated = false;
+			}
+		}).start();
+		return answer;
+		
+	}
 	
+	
+	//case interpel	
+	private static String interpel(String content, User author, ChannelInstance instance){
+		Random rand = new Random();
+		if (rand.nextInt(100) > 20) {
+			instance.askings.put(author, new Asking(author, 1));
+			return Sentences.getRdmSentence(Sentences.answer_interpel, author);
+		} else {
+			if (author.getName().toUpperCase().equals("FENARO07")) {
+				instance.askings.put(author, new Asking(author, 4, "FENARO"));
+				return "On m'a dit que tu avais une arme à feu entre les jambes. C'est vrai?";
+			}
+			return "Non. *Tire la langue*";
+		}
+	}
 	
 	//###METHODS UTILS###
-		
+	private static String greetingBack(User author, Mode mode) {
+		String msg = "Bonjour";
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat("HH");
+		int heure = Integer.decode(sdf.format(cal.getTime()));
+
+		if (heure < 11)
+			heure = 1;
+		else if (heure > 17)
+			heure = -1;
+		else
+			heure = 0;
+		if (mode.i != 0 && heure != mode.i) {
+			switch (mode.i) {
+			case -1:
+				msg = Sentences.getRdmSentence(Sentences.greeting_not_soir, author);
+				break;
+			case 1:
+				msg = Sentences.getRdmSentence(Sentences.greeting_not_jour, author);
+			}
+
+			msg += " M'enfin bienvenue à bord!";
+		} else {
+			switch (heure) {
+			case -1:
+				msg = Sentences.getRdmSentence(Sentences.greeting_soir, author);
+				break;
+			case 0:
+				msg = Sentences.getRdmSentence(Sentences.greeting_nope, author);
+				break;
+			case 1:
+				msg = Sentences.getRdmSentence(Sentences.greeting_jour, author);
+			}
+		}
+
+		return msg;
+	}
+	
+	
+	
 	public static String getRdmSentence(String[] sentences, User destinataire) {
 		Random rand = new Random();
 		return replaceTag(sentences[rand.nextInt(sentences.length)], destinataire);
@@ -298,43 +380,5 @@ public abstract class Sentences {
 		return token;
 	}
 	
-	private enum Command{
-		MESSAGE, PERSONNE, TOURNES, TRISTE, QUESTION, JOUER, ABSENCE, SURNOM, SURNOM_ALL, RIEN, ARGENT, CAVA, COMMANDES, AMOUR, ALLSURNAME;
-		
-		public static Command getCommand(String str){
-			String msg = str.toUpperCase();
-			if (msg.contains("DIS À"))
-				return MESSAGE;
-			if (msg.contains("IL N'Y A PERSONNE?"))
-				return PERSONNE;
-			if (msg.contains("T.T"))
-				return TRISTE;
-			if (msg.contains("TU TOURNES"))
-				return TOURNES;
-			if (msg.contains("JE M'ABSENTE"))
-				return ABSENCE;		
-			if (msg.contains("NOUVEAU SURNOM POUR ALL"))
-				 return SURNOM_ALL;
-			 if (msg.contains("NOUVEAU SURNOM POUR"))
-				 return SURNOM;
-			 if (msg.contains("PARTIE DE DÉS"))
-				 return JOUER;
-			 if (msg.equals("RIEN"))
-				 return RIEN;
-			 if (msg.contains("ÇA VA?") || msg.contains("CA VA ?"))
-					return CAVA;
-			if (msg.contains("COMBIEN J'AI?") || msg.equals("COMBIEN J'AI ?"))
-					return ARGENT;
-			if(msg.contains("COMMANDES?") || msg.contains("COMMANDES ?"))
-				return COMMANDES;
-			if(msg.contains("TU M'AIMES?") || msg.contains("TU M'AIMES ?"))
-				return AMOUR;
-			if (msg.contains("TOUT LES SURNOMS DE"))
-				return ALLSURNAME;
-			if (msg.endsWith("?"))
-				return QUESTION;
-			return null;
-		}
-	}	
 	
 }

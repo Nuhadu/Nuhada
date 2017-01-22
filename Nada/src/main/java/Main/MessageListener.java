@@ -1,8 +1,6 @@
 package Main;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.StringTokenizer;
@@ -19,8 +17,6 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class MessageListener extends ListenerAdapter {
-
-	
 
 	public HashMap<TextChannel, ChannelInstance> channelInstances;
 
@@ -118,7 +114,7 @@ public class MessageListener extends ListenerAdapter {
 
 	private boolean concerned(Message message) {
 		String msg = message.getContent().toUpperCase();
-		if (interpelationOnly(msg))
+		if (Command.interpelationOnly(msg))
 			return true;
 		if (interpelation(msg))
 			return true;
@@ -165,39 +161,7 @@ public class MessageListener extends ListenerAdapter {
 		return false;
 	}
 
-	private boolean interpelationOnly(String msg) {
-		if (msg.equals("NADA"))
-			return true;
-		if (msg.equals("NUHADA"))
-			return true;
-
-		if (msg.equals("NADA!"))
-			return true;
-		if (msg.equals("NUHADA!"))
-			return true;
-
-		if (msg.equals("NADA?"))
-			return true;
-		if (msg.equals("NUHADA?"))
-			return true;
-
-		if (msg.equals("NADA ?"))
-			return true;
-		if (msg.equals("NUHADA ?"))
-			return true;
-
-		if (msg.equals("NADA !"))
-			return true;
-		if (msg.equals("NUHADA !"))
-			return true;
-		
-		if (msg.equals("NADA,"))
-			return true;
-		if (msg.equals("NUHADA,"))
-			return true;
-		
-		return false;
-	}
+	
 
 	private boolean greeting(String msg, Mode mode) {
 		String token = "";
@@ -260,84 +224,12 @@ public class MessageListener extends ListenerAdapter {
 		return false;
 	}
 
-	private String greetingBack(User author, Mode mode) {
-		String msg = "Bonjour";
-		Calendar cal = Calendar.getInstance();
-		SimpleDateFormat sdf = new SimpleDateFormat("HH");
-		int heure = Integer.decode(sdf.format(cal.getTime()));
-
-		if (heure < 11)
-			heure = 1;
-		else if (heure > 17)
-			heure = -1;
-		else
-			heure = 0;
-		if (mode.i != 0 && heure != mode.i) {
-			switch (mode.i) {
-			case -1:
-				msg = Sentences.getRdmSentence(Sentences.greeting_not_soir, author);
-				break;
-			case 1:
-				msg = Sentences.getRdmSentence(Sentences.greeting_not_jour, author);
-			}
-
-			msg += " M'enfin bienvenue à bord!";
-		} else {
-			switch (heure) {
-			case -1:
-				msg = Sentences.getRdmSentence(Sentences.greeting_soir, author);
-				break;
-			case 0:
-				msg = Sentences.getRdmSentence(Sentences.greeting_nope, author);
-				break;
-			case 1:
-				msg = Sentences.getRdmSentence(Sentences.greeting_jour, author);
-			}
-		}
-
-		return msg;
-	}
+	
 
 	private String answer(User author, Message message, TextChannel channel) {
-		
-		String msg = message.getContent().toUpperCase();
-		Random rand = new Random();
-		HashMap<User, Asking> askings = channelInstances.get(channel).askings;
-		
+				
 		String answer = Sentences.getAnswerCommand(message, author, channelInstances.get(channel));
 		if(!answer.equals("")) return answer;
-		
-		if (interpelationOnly(msg)) {
-			if (rand.nextInt(100) > 20) {
-				askings.put(author, new Asking(author, 1));
-				return Sentences.getRdmSentence(Sentences.answer_interpel, author);
-			} else {
-				if (author.getName().toUpperCase().equals("FENARO07")) {
-					askings.put(author, new Asking(author, 4, "FENARO"));
-					return "On m'a dit que tu avais une arme à feu entre les jambes. C'est vrai?";
-				}
-				return "Non. *Tire la langue*";
-			}
-
-		} 
-		
-		Mode mode = new Mode(0);
-		if (greeting(message.getContent().toUpperCase(), mode)) {	
-			answer = greetingBack(author, mode);
-			greated = true;
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						Thread.sleep(3600000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					greated = false;
-				}
-			}).start();
-			return answer;
-		} // Nada
 			
 		
 		if( answer.equals(""))
