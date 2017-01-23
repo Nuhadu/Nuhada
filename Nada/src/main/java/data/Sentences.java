@@ -9,8 +9,11 @@ import java.util.StringTokenizer;
 import Main.Mode;
 import channelinstance.Absence;
 import channelinstance.Asking;
+import channelinstance.Asking.AskType;
 import channelinstance.ChannelInstance;
 import channelinstance.MessageForYou;
+import jeux.DesFurieux;
+import jeux.Jeux;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
 
@@ -116,21 +119,187 @@ public abstract class Sentences {
 		return answer;
 	}
 	
+	public static String asking(Asking ask, Message message, ChannelInstance instance) {
+		String answer = "";
+		switch(ask.mode){
+		case ABSENCE:
+			answer = ask_absence(ask,message, instance);
+			break;
+		case INTERPEL:
+			answer = ask_interpel(ask, message, instance);
+			break;
+		case JEU:
+			answer = ask_jeu(ask, message, instance);
+			break;
+		case QUESTION:
+			answer = ask_question(ask, message.getContent(), instance);
+			break;
+		default:
+			break;
+		
+		}
+		
+		return answer;
+	}
 	
+	private static String ask_absence(Asking ask, Message message, ChannelInstance instance){
+		String msg = message.getContent().toUpperCase();
+		if (ask.var.equals("")) {
+			ask.var = "SECOND";
+			if (msg.contains("NON")) {
+				return "Dis moi au moins quand tu reviens! >_<*";
+			} else {
+				instance.absences.get(ask.author).changeReason(message.getContent());
+				return "Et tu reviens quand?";
+			}
+		} else if (ask.var.equals("SECOND")) {
+			if (msg.contains("JAMAIS")) {
+				ask.var = "THIRD_BAD";
+				return "Ben tant mieux! D'abord !";
+			} else {
+				ask.var = "THIRD";
+				instance.absences.get(ask.author).changeRetour(message.getContent());
+				return "Ca marche! En route pour l'aventure!";
+			}
+		} else if (ask.var.contains("THIRD")) {
+			instance.absences.remove(ask.author);
+			if (ask.var.contains("BAD")){
+				return"*Tire une balle dans le coeur de " + getSurname(ask.author, false)
+						+ "* \n Fallait t'en tenir à ta parole.";
+			}
+			else {
+				return "Bon retour " + getSurname(ask.author, true) + "!"
+				 + "\n" + getAnswerCommand(message, ask.author, instance);
+			}
+		}		
+		return "";
+	}
+	
+	private static String ask_interpel(Asking ask, Message message, ChannelInstance instance){
+		String msg = message.getContent().toUpperCase();
+		if (msg.contains("TU TOURNES")) {
+			instance.askings.remove(ask.author);
+			Affinity.changeAfinity(-2, ask.author.getId());
+			return "Mooo! *Tourne sur elle même en faisant la moue*";			
+		} else {
+			instance.askings.remove(ask.author);
+			return getAnswerCommand( message,ask.author, instance);
+		}
+	}
+	
+	private static String ask_jeu(Asking ask, Message message, ChannelInstance instance){
+		String msg = message.getContent().toUpperCase();
+		if (ask.var.equals("")) {// qui sont les joueurs
+			if (msg.equals("GO")) {
+				if (instance.users.size() < 2)
+					return "Pas assez de joueurs, qui d'autre?";
+				else {
+					instance.jeu = new DesFurieux(instance.users);
+					instance.askings.remove(ask.author);
+					return "Je lance le jeu!\n" + gameConducted(ask.author, message.getContent(), instance);
+				}
+			} else if(msg.equals("ANNULE")){
+				instance.askings.remove(ask.author);
+				instance.users = null;
+				return "Oh :/";
+			}
+			else if(msg.equals("MOI")){
+				String answer = "J'ai les joueurs:";
+				for (User user : instance.users)
+					answer += " " + getSurname(user, false);
+				return answer += "\n Go? ou Annule?";
+			} else {
+				String answer = "";
+				if (message.getMentionedUsers().size() < 1)
+					answer = "J'ai demandé des joueurs, pas des fantômes.\n";
+				else {
+					for (User user : message.getMentionedUsers())
+						if (!instance.users.contains(user)) {
+							instance.users.add(user);
+						}
+				}
+				answer += "J'ai les joueurs:";
+				for (User user : instance.users)
+					answer += " " + Sentences.getSurname(user, false);
+				return answer += "\n Go?";
+			}
+		}
+		return "";
+	}
+	
+	private static String ask_question(Asking ask, String content, ChannelInstance instance){
+		String msg = content.toUpperCase();
+		if (ask.var.equals("CAVA")) {
+			instance.askings.remove(ask.author);
+			return "C'est pas comme si ça m'intéressait de toute façon.";
+		} else if (ask.var.equals("COMBIEN")) {
+			instance.askings.remove(ask.author);
+			if (msg.equals("OUI")) {
+				if (Bank.retire(1, ask.author.getId())) {
+					Affinity.changeAfinity(1, ask.author.getId());
+					return "Héhé, je te le revaudrai!";
+				} else
+					return"Haha, t'es trop pauvre pour ça!";
+			} else {
+				return "Méchant :/";
+			}
+
+		} else if (ask.var.equals("FENARO")) {
+			String answer = "";
+			if (msg.contains("OUI")) {
+				 answer = "Il faudra me montrer ça!";
+			} else if (msg.contains("NON")) {
+				 answer = "Dommage, tu aurais pu être revendue un bon prix avec ça.";
+			} else {
+				 answer = "Haha :D";
+			}
+			ask.mode = AskType.INTERPEL;
+			ask.var = "";
+			return answer + "\n Sinon tu voulais quelque chose?";
+		}
+		
+		return "";
+	}	
+	
+	public static String gameConducted(User author, String message, ChannelInstance instance) {
+		Jeux jeu = instance.jeu;
+		String msg = message.toUpperCase();
+		String answer = "";
+
+		if (!jeu.initialized()) {
+			return jeu.initialize();
+		} else if (!jeu.isStarted()) {
+			if (msg.equals("PRÊT")) {
+				boolean go = jeu.userPrepare(author);
+				if (go) {
+					return jeu.play();
+				} else {
+					return "Il manque" + jeu.userEnAttente();
+				}
+			} else if (msg.equals("RÈGLES")) {
+				return jeu.regle();
+			}
+		} else if (jeu.seekCommand()) {
+			return jeu.receive(message, author);
+		} else if (jeu.ended())
+			instance.jeu = null;
+
+		return answer;
+	}
 	
 	//CASE ABSENCE
 	private static String absence(ChannelInstance instance, User author){
 		if (instance.askings.get(author) != null)
 			if (instance.askings.get(author).var.equals("THIRD"))
 				return ABSENCE_INUTILE;
-		instance.askings.put(author, new Asking(author, 3));
+		instance.askings.put(author, new Asking(author, AskType.ABSENCE));
 		instance.absences.put(author, new Absence(author));
 		return ABSENCE;
 	}
 	
 	//CASE JOUER
 	private static String jouer(ChannelInstance instance, User author){		
-		instance.askings.put(author, new Asking(author, 2));
+		instance.askings.put(author, new Asking(author, AskType.JEU));
 		instance.users = new ArrayList<User>();
 		instance.users.add(author);
 		return DES_FURIEUX;
@@ -188,7 +357,7 @@ public abstract class Sentences {
 	
 	//case TOURNES:	
 	private static String tournes(ChannelInstance instance, User author){
-		if(instance.askings.get(author).mode == 1){
+		if(instance.askings.get(author).mode == AskType.INTERPEL){
 			Affinity.changeAfinity(-2, author.getId());
 			return TOURNE_OUI;
 		}		
@@ -219,14 +388,14 @@ public abstract class Sentences {
 		answer = replaceTag(ARGENT_COMBIEN_TAG, author);
 		if (rand.nextInt(100) > 80){
 			answer += ARGENT_DONNE;
-			instance.askings.put(author, new Asking(author, 4, "COMBIEN"));
+			instance.askings.put(author, new Asking(author, AskType.QUESTION, "COMBIEN"));
 		}
 		return answer;
 	}
 	
 	//case CAVA:	
 	private static String cava(ChannelInstance instance, User author){
-		instance.askings.put(author, new Asking(author, 4, "CAVA"));
+		instance.askings.put(author, new Asking(author, AskType.QUESTION, "CAVA"));
 		return CAVA ;
 	}
 	
@@ -280,11 +449,11 @@ public abstract class Sentences {
 	private static String interpel(String content, User author, ChannelInstance instance){
 		Random rand = new Random();
 		if (rand.nextInt(100) > 20) {
-			instance.askings.put(author, new Asking(author, 1));
+			instance.askings.put(author, new Asking(author, AskType.INTERPEL));
 			return getRdmSentence(ANSWER_INTERPEL, author);
 		} else {
 			if (author.getName().toUpperCase().equals("FENARO07")) {
-				instance.askings.put(author, new Asking(author, 4, "FENARO"));
+				instance.askings.put(author, new Asking(author, AskType.QUESTION, "FENARO"));
 				return INTERPEL_FENARO;
 			}
 			return INTERPEL_NO;

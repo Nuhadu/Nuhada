@@ -28,7 +28,7 @@ public abstract class Jeux {
 	}
 
 	public String initialize() {
-		return "Le jeu est prêt! Voulez vous lire les 'règles' ou êtes vous 'prêt'?";
+		return "Le jeu est prêt! Pour l'arrêter il suffit de dire 'stop that shit', à tout moment. Voulez vous lire les 'règles' ou êtes vous 'prêt'?";
 	}
 
 	public abstract String play();
