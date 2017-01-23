@@ -2,7 +2,6 @@ package Main;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 import channelinstance.*;
 import channelinstance.Asking.AskType;
@@ -19,8 +18,6 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 public class MessageListener extends ListenerAdapter {
 
 	public HashMap<TextChannel, ChannelInstance> channelInstances;
-
-	public boolean greated = false;
 
 	public MessageListener() {
 		super();
@@ -162,8 +159,6 @@ public class MessageListener extends ListenerAdapter {
 		String msg = message.getContent().toUpperCase();
 		if ( Command.isCommand( msg, channelInstances.get(message.getChannel()) ) )
 			return true;
-		if (emote(msg))
-			return true;
 		if (msg.contains("ARGENT"))
 			return true;
 		if (msg.contains("REINE"))
@@ -171,18 +166,5 @@ public class MessageListener extends ListenerAdapter {
 
 		return false;
 	}
-
-	private boolean emote(String msg) {
-		boolean bool = false;
-
-		Random rand = new Random();
-		boolean chance = (rand.nextInt(100) > 50);
-		if (msg.contains("T.T"))
-			bool = true;
-
-		return bool && chance;
-	}
-	
-
 
 }
