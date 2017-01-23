@@ -1,6 +1,12 @@
 package data;
 
-public class Sentences {
+public abstract class Sentences {
+	/*ALL SENTENCES CONTAINING TAG NEED TO SPECIFY THE REQUIRED SOURCES
+	 *  #NAME AND #SOLDE 	NEED 	_USER
+	 *  #ITEM 				NEED	_ITEM
+	 */
+	
+	
 	//ANSWER
 	public final static String ABSENCE = "Oh :/ pourquoi?";
 	public final static String ABSENCE_INUTILE = "Mais c'était inutile de revenir X)";
@@ -12,9 +18,9 @@ public class Sentences {
 	public final static String PERSONNE_AFK =  "Pour l'instant que moi mais";
 	public final static String TOURNE_OUI = "Mooo! *Tourne sur elle même en faisant la moue*";
 	public final static String TOURNE_NON ="Cette fois, c'est pas pour moi! ;)";
-	public final static String TRISTE_PITIE_TAG = "*Prends pitié de #NAME et lui donne 1 qual*";
-	public final static String TRISTE_PATPAT_TAG = "*pat pat #NAME.*";
-	public final static String ARGENT_COMBIEN_TAG = "Tu as #SOLDE quals.";
+	public final static String TRISTE_PITIE_USER_ITEM = "*Prends pitié de #NAME et lui donne #ITEM.*";
+	public final static String TRISTE_PATPAT_USER = "*pat pat #NAME.*";
+	public final static String ARGENT_COMBIEN_USER = "Tu as #SOLDE quals.";
 	public final static String ARGENT_DONNE = " Tu m'en donnes un?";
 	public final static String CAVA = "Ça va et toi?";
 	public final static String RIEN = "Ben m'embête pas alors!";
@@ -23,8 +29,12 @@ public class Sentences {
 	public final static String INTERPEL_NO = "Non. *Tire la langue*";
 	public final static String INTERPEL_FENARO = "On m'a dit que tu avais une arme à feu entre les jambes. C'est vrai?";
 	public final static String GREETINGBACK_MENFIN = " M'enfin bienvenue à bord!";
-	public final static String MESSAGEFOR_HEY = "Hey #NAME! ";
+	public final static String MESSAGEFOR_HEY_USER = "Hey #NAME! ";
 	public final static String ASKED_INEXIST_THIB = "Désolé mon chou, mais je n'ai pas de réponses :/";
+	public final static String CADEAU_INEXIST = "Tu te moques de moi?";
+	public final static String MERCI_USER = "Merci #NAME.";
+	public final static String EAT_POMME_NADA = "*Nuhada mange la pomme joyeusement.*";
+	public final static String PREND_UNIQUEF_NADA ="Une suffira.";
 	//ASK
 	public final static String ASK_NONE = "";
 	public final static String ASK_SECOND = "SECOND";
@@ -34,8 +44,8 @@ public class Sentences {
 	public final static String ASK_REASON_YES = "Et tu reviens quand?";
 	public final static String ASK_RETOUR_NO = "Ben tant mieux! D'abord !";
 	public final static String ASK_RETOUR_YES = "Ca marche! En route pour l'aventure!";
-	public final static String ASK_RETOUR_BAD_TAG = "*Tire une balle dans le coeur de #NAME* \n Fallait t'en tenir à ta parole.";
-	public final static String ASK_RETOUR_TAG = "Bon retour #NAME!";
+	public final static String ASK_RETOUR_BAD_USER = "*Tire une balle dans le coeur de #NAME* \n Fallait t'en tenir à ta parole.";
+	public final static String ASK_RETOUR_USER = "Bon retour #NAME!";
 	public final static String ASK_INTERPEL_TOURNES = "Mooo! *Tourne sur elle même en faisant la moue*";
 	public final static String ASK_JEU_NOT_ENOUGH = "Pas assez de joueurs, qui d'autre?";	
 	public final static String ASK_JEU_LANCE = "Je lance le jeu!";
@@ -46,7 +56,7 @@ public class Sentences {
 	public final static String ASK_CAVA = "CAVA";
 	public final static String ASK_COMBIEN = "COMBIEN";
 	public final static String ASK_QUESTION_MERCI = "Héhé, je te le revaudrai!";
-	public final static String ASK_QUESTION_MOQUE = "Haha, t'es trop pauvre pour ça!";
+	public final static String ARGENT_MOQUE = "Haha, t'es trop pauvre pour ça!";
 	public final static String ASK_MECHANT = "Méchant :/";
 	public final static String ASK_FENARO_OUI = "Il faudra me montrer ça!";
 	public final static String ASK_FENARO_NON = "Dommage, tu aurais pu être revendue un bon prix avec ça.";

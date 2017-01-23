@@ -11,6 +11,7 @@ import channelinstance.Absence;
 import channelinstance.Asking;
 import channelinstance.Asking.AskType;
 import data.Affinity;
+import item.Item;
 import channelinstance.ChannelInstance;
 import channelinstance.MessageForYou;
 import jeux.DesFurieux;
@@ -81,6 +82,9 @@ public abstract class Answers {
 		case INTERPEL:
 			answer = interpel(message.getContent(), author, instance);
 			break;
+		case CADEAU:
+			answer = cadeau(message.getContent(), author);
+			break;
 		}
 		
 		
@@ -132,10 +136,10 @@ public abstract class Answers {
 		} else if (ask.var.contains(Sentences.ASK_THIRD)) {
 			instance.absences.remove(ask.author);
 			if (ask.var.contains(Sentences.ASK_BAD)){
-				return replaceTag(Sentences.ASK_RETOUR_BAD_TAG, ask.author);
+				return replaceTag(Sentences.ASK_RETOUR_BAD_USER, ask.author);
 			}
 			else {
-				return replaceTag(Sentences.ASK_RETOUR_TAG, ask.author) + "\n" + getAnswerCommand(message, ask.author, instance);
+				return replaceTag(Sentences.ASK_RETOUR_USER, ask.author) + "\n" + getAnswerCommand(message, ask.author, instance);
 			}
 		}		
 		return "";
@@ -204,7 +208,7 @@ public abstract class Answers {
 					Affinity.changeAfinity(1, ask.author.getId());
 					return Sentences.ASK_QUESTION_MERCI;
 				} else
-					return Sentences.ASK_QUESTION_MOQUE;
+					return Sentences.ARGENT_MOQUE;
 			} else {
 				return Sentences.ASK_MECHANT;
 			}
@@ -335,11 +339,10 @@ public abstract class Answers {
 	private static String triste(User author){
 		Random rand = new Random();
 		if (rand.nextInt(100) > 75) {
-			Bank.retire(-1, author.getId());
-			return replaceTag(Sentences.TRISTE_PITIE_TAG, author);
+			return replaceTag( replaceTag(Sentences.TRISTE_PITIE_USER_ITEM, author), Item.getRdmItem().cadeauItemTo(author.getId()));
 		} else {			
 			Affinity.changeAfinity(2, author.getId());
-			return replaceTag(Sentences.TRISTE_PATPAT_TAG, author);
+			return replaceTag(Sentences.TRISTE_PATPAT_USER, author);
 		}
 	}
 	
@@ -352,7 +355,7 @@ public abstract class Answers {
 	private static String argent(ChannelInstance instance, User author){
 		String answer = "";
 		Random rand = new Random();
-		answer = replaceTag(Sentences.ARGENT_COMBIEN_TAG, author);
+		answer = replaceTag(Sentences.ARGENT_COMBIEN_USER, author);
 		if (rand.nextInt(100) > 80){
 			answer += Sentences.ARGENT_DONNE;
 			instance.askings.put(author, new Asking(author, AskType.QUESTION, "COMBIEN"));
@@ -427,10 +430,20 @@ public abstract class Answers {
 		}
 	}
 	
-	//###METHODS UTILS###
+	//case cadeau
+	private static String cadeau(String content, User author){
+		String cadeau = searchSentenceAfter(content, "DONNE", null);
+		Item item = Item.decodeItem(cadeau);
+		
+		if(item == null){
+			Affinity.changeAfinity(-2, author.getId());
+			return Sentences.CADEAU_INEXIST;
+		}
+		
+		return replaceTag(Item.cadeauItemFrom(item, author.getId()), author);
+	}
 	
-	
-	
+	//###METHODS UTILS###	
 	private static String greetingBack(User author, Mode mode) {
 		String msg = "Bonjour";
 		Calendar cal = Calendar.getInstance();
@@ -469,27 +482,30 @@ public abstract class Answers {
 	}
 	
 	
-	
 	public static String getRdmSentence(String[] sentences, User destinataire) {
 		Random rand = new Random();
 		return replaceTag(sentences[rand.nextInt(sentences.length)], destinataire, true);
 	}
 	
-	private static String replaceTag(final String str, User destinataire) {
-		String result = ""+str;
-		if(str.contains("#NAME"))
-			result =  str.replace("#NAME", getSurname(destinataire, true));
-		if(str.contains("#SOLDE"))
-			result = result.replace("#SOLDE", "" +Bank.getSolde(destinataire.getId()));
-		return result;
+	private static String replaceTag(final String str, Object source) {
+		return replaceTag(str, source, true);
 	}
 	
-	private static String replaceTag(final String str, User destinataire, boolean canAll) {
+	private static String replaceTag(final String str, Object source, boolean canAll) {
 		String result = ""+str;
-		if(str.contains("#NAME"))
-			result =  str.replace("#NAME", getSurname(destinataire, canAll));
-		if(str.contains("#SOLDE"))
-			result = result.replace("#SOLDE", "" +Bank.getSolde(destinataire.getId()));
+		if( source instanceof User){
+			User user = (User) source;
+			while(result.contains("#NAME"))
+				result =  str.replace("#NAME", getSurname(user, canAll));
+			
+			while(result.contains("#SOLDE"))
+				result = result.replace("#SOLDE", "" +Bank.getSolde(user.getId()));
+		}
+		else if( source instanceof Item){
+			Item item = (Item) source;
+			while(result.contains("#ITEM"))
+				result = result.replace("#ITEM", item.toString());
+		}
 		return result;
 	}
 	
@@ -539,6 +555,6 @@ public abstract class Answers {
 	}
 	
 	public static String messageFor(User dest, MessageForYou msg){
-		return replaceTag(Sentences.MESSAGEFOR_HEY, dest) + replaceTag(msg.toString(),msg.author);
+		return replaceTag(Sentences.MESSAGEFOR_HEY_USER, dest) + replaceTag(msg.toString(),msg.author);
 	}
 }

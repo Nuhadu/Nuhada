@@ -1,5 +1,6 @@
 package data;
 
+import java.util.Random;
 import java.util.StringTokenizer;
 
 import Main.Mode;
@@ -7,7 +8,7 @@ import channelinstance.ChannelInstance;
 
 public enum Command{
 	MESSAGE, PERSONNE, TOURNES, TRISTE, QUESTION, JOUER, ABSENCE, SURNOM, SURNOM_ALL, RIEN, ARGENT, CAVA, 
-	COMMANDES, AMOUR, ALLSURNAME, BONJOUR, INTERPEL;
+	COMMANDES, AMOUR, ALLSURNAME, BONJOUR, INTERPEL, CADEAU;
 	
 	public static Command getCommand(String str, Mode mode){
 		String msg = str.toUpperCase();
@@ -41,9 +42,12 @@ public enum Command{
 			return AMOUR;
 		if (msg.contains("TOUT LES SURNOMS DE"))
 			return ALLSURNAME;
-		if(isGreeting(msg, mode))
-			return BONJOUR;
+		if(msg.contains("JE TE DONNE"))
+			return CADEAU;
 		
+		
+		if(isGreeting(msg, mode))
+			return BONJOUR;		
 		if (msg.endsWith("?"))
 			return QUESTION;
 		return null;
@@ -55,8 +59,9 @@ public enum Command{
 		if( cmd == null)
 			return false;
 		
+		int i = new Random().nextInt(100);
 		//Commandes ne nécessitant pas d'interpelation
-		if( cmd == TRISTE || cmd == INTERPEL || cmd == PERSONNE || cmd == TOURNES || (cmd == BONJOUR && !instance.greated) )
+		if( (cmd == TRISTE && i > 50) || cmd == INTERPEL || cmd == PERSONNE || cmd == TOURNES || (cmd == BONJOUR && !instance.greated) )
 			return true;
 		
 		if (interpelation(str))
