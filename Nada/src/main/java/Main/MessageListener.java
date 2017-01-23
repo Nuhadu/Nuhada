@@ -70,7 +70,7 @@ public class MessageListener extends ListenerAdapter {
 		HashMap<User, MessageForYou> messages = channelInstances.get(channel).messages;
 		if (!messages.isEmpty())
 			if (messages.get(dest) != null){
-				channel.sendMessage(Sentences.messageFor(dest, messages.get(dest))).queue();
+				channel.sendMessage(Answers.messageFor(dest, messages.get(dest))).queue();
 				messages.remove(dest);
 			}
 	}
@@ -88,7 +88,7 @@ public class MessageListener extends ListenerAdapter {
 		Jeux jeu = channelInstances.get(channel).jeu;
 		if (jeu != null) 
 			if (jeu.isInGame(author) && jeu.concerned(msg.getContent(), author)) {
-				String str = Sentences.gameConducted(author, msg.getContent(), channelInstances.get(channel));
+				String str = Answers.gameConducted(author, msg.getContent(), channelInstances.get(channel));
 				if (!str.equals("")) {					
 					channel.sendMessage(str).queue();
 					return true;
@@ -105,9 +105,9 @@ public class MessageListener extends ListenerAdapter {
 					ArrayList<User> users = channelInstances.get(channel).users;
 					if(!users.contains(author)){
 						users.add(author);
-						str = "J'ai ajouté " + Sentences.getSurname(author, false) +". Quelqu'un d'autre ou go?";
+						str = "J'ai ajouté " + Answers.getSurname(author, false) +". Quelqu'un d'autre ou go?";
 					} else
-						str = "Tu as déjà été ajouté " + Sentences.getSurname(author, false) + ".";
+						str = "Tu as déjà été ajouté " + Answers.getSurname(author, false) + ".";
 					channel.sendMessage(str).queue();
 					return true;
 				}
@@ -118,7 +118,7 @@ public class MessageListener extends ListenerAdapter {
 	private boolean answerAsk(User author, Message msg, TextChannel channel){
 		HashMap<User, Asking> askings = channelInstances.get(channel).askings;
 		if (askings.get(author) != null) {
-			String str = Sentences.asking(askings.get(author), msg, channelInstances.get(channel));
+			String str = Answers.asking(askings.get(author), msg, channelInstances.get(channel));
 			if (str != "") {
 				channel.sendMessage(str).queue();
 				return  true;
@@ -128,7 +128,7 @@ public class MessageListener extends ListenerAdapter {
 	}
 	
 	private String answer(User author, Message message, TextChannel channel) {				
-		String answer = Sentences.getAnswerCommand(message, author, channelInstances.get(channel));
+		String answer = Answers.getAnswerCommand(message, author, channelInstances.get(channel));
 		if(!answer.equals("")) return answer;
 		if( answer.equals(""))
 			return "Oups, pas de réponses";
