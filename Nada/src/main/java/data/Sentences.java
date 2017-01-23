@@ -1,6 +1,7 @@
 package data;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
@@ -35,6 +36,7 @@ public abstract class Sentences {
 	private final static String INTERPEL_NO = "Non. *Tire la langue*";
 	private final static String INTERPEL_FENARO = "On m'a dit que tu avais une arme à feu entre les jambes. C'est vrai?";
 	private final static String GREETINGBACK_MENFIN = " M'enfin bienvenue à bord!";
+	private final static String MESSAGEFOR_HEY = "Hey #NAME! ";
 	
 	public final static String[] DEST_TROP =  {"Il m'faut un unique destinataire. J'suis pas un pigeon voyageur magique", "Hé oh! Un à la fois! J'suis pas un perroquet!"};
 	public final static String[] GREETING_SOIR = { "Bonsoir #NAME!", "Bienvenue #NAME.", "On attendait plus que toi!","Oh non pas lui.." };
@@ -129,6 +131,8 @@ public abstract class Sentences {
 	//CASE JOUER
 	private static String jouer(ChannelInstance instance, User author){		
 		instance.askings.put(author, new Asking(author, 2));
+		instance.users = new ArrayList<User>();
+		instance.users.add(author);
 		return DES_FURIEUX;
 	}
 	
@@ -389,5 +393,7 @@ public abstract class Sentences {
 		return token;
 	}
 	
-	
+	public static String messageFor(User dest, MessageForYou msg){
+		return replaceTag(MESSAGEFOR_HEY, dest) + replaceTag(msg.toString(),msg.author);
+	}
 }

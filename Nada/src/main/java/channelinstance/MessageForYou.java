@@ -13,7 +13,7 @@ public class MessageForYou {
 
 	@Override
 	public String toString() {
-		return author.getName() + " te dit : " + message;
+		return "#NAME te dit : " + message;
 	}
 
 }
