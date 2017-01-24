@@ -87,6 +87,9 @@ public abstract class Answers {
 		case CADEAU:
 			answer = cadeau(message.getContent(), author);
 			break;
+		case INVENTAIRE:
+			answer = inventaire(author);
+			break;
 		}
 		
 		Random rand = new Random();
@@ -451,6 +454,19 @@ public abstract class Answers {
 			return Sentences.CADEAU_HAVENOT;
 		
 		return replaceTag(Item.cadeauItemFrom(item, author.getId()), author);
+	}
+	
+	//case inventaire
+	private static String inventaire(User author){
+		List<Item> items = InventoryManager.getAllItem(author.getId());
+		if(items.size() == 0)
+			return Sentences.INVENTORY_RIEN;
+		
+		String answer = Sentences.INVENTORY_START;
+		for(Item item : items )
+			answer += "\n\t*" + item ;
+		
+		return answer;
 	}
 	
 	//###METHODS UTILS###	

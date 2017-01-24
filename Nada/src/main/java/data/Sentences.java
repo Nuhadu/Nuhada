@@ -32,6 +32,8 @@ public abstract class Sentences {
 		//I
 	public final static String INTERPEL_NO = "Non. *Tire la langue*";
 	public final static String INTERPEL_FENARO = "On m'a dit que tu avais une arme à feu entre les jambes. C'est vrai?";
+	public final static String INVENTORY_RIEN = "Rien. Comme tu es malchanceux :3.";
+	public final static String INVENTORY_START = "Tu possèdes :";
 		//J
 	public final static String JEU_MANQUE = "Il manque";
 		//M	

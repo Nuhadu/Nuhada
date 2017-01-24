@@ -8,7 +8,7 @@ import channelinstance.ChannelInstance;
 
 public enum Command{
 	MESSAGE, PERSONNE, TOURNES, TRISTE, QUESTION, JOUER, ABSENCE, SURNOM, SURNOM_ALL, RIEN, ARGENT, CAVA, 
-	COMMANDES, AMOUR, ALLSURNAME, BONJOUR, INTERPEL, CADEAU;
+	COMMANDES, AMOUR, ALLSURNAME, BONJOUR, INTERPEL, CADEAU, INVENTAIRE;
 	
 	public static Command getCommand(String str, Mode mode){
 		String msg = str.toUpperCase();
@@ -30,13 +30,15 @@ public enum Command{
 		 if (msg.equals("RIEN"))
 			 return RIEN;
 		 if (msg.equals("ÇA VA?") || msg.equals("CA VA ?"))
-				return CAVA;
+			return CAVA;
 		 if (msg.equals("COMBIEN J'AI?") || msg.equals("COMBIEN J'AI ?"))
-				return ARGENT;
+			return ARGENT;
 		 if(msg.equals("COMMANDES?") || msg.equals("COMMANDES ?"))
-				return COMMANDES;
+			return COMMANDES;
 		 if(msg.equals("TU M'AIMES?") || msg.equals("TU M'AIMES ?"))
-				return AMOUR;
+			return AMOUR;
+		 if(msg.equals("INVENTAIRE") || msg.equals("QU'EST-CE QUE J'AI?") || msg.equals("QU'EST-CE QUE J'AI ?"))
+			 return INVENTAIRE;
 		 //BEGIN WITH
 		if (msg.startsWith("DIS À"))
 			return MESSAGE;
