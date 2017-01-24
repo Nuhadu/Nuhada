@@ -24,6 +24,12 @@ public abstract class SurnameStorage {
 				JSONObject json = new JSONObject();
 				json.write(in);
 				in.close();
+				addSurname("mon petit", "ALL");
+				addSurname("mon braillard", "ALL");
+				addSurname("Bob", "ALL");
+				addSurname("matelot", "ALL");
+				addSurname("moussaillon", "ALL");
+				addSurname("petit malin", "ALL");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -14,38 +14,42 @@ public enum Command{
 		String msg = str.toUpperCase();
 		if (interpelationOnly(str))
 			return INTERPEL;
-		if (msg.contains("DIS À"))
-			return MESSAGE;
-		if (msg.contains("IL N'Y A PERSONNE?"))
-			return PERSONNE;
-		if (msg.contains("T.T"))
+		
+		msg = withoutInterpelation(msg);
+		//EQUALS
+		if (msg.equals("T.T"))
 			return TRISTE;
-		if (msg.contains("TU TOURNES"))
+		if (msg.equals("TU TOURNES"))
 			return TOURNES;
-		if (msg.contains("JE M'ABSENTE"))
+		if (msg.equals("JE M'ABSENTE"))
 			return ABSENCE;		
-		if (msg.contains("NOUVEAU SURNOM POUR ALL"))
+		if (msg.equals("NOUVEAU SURNOM POUR ALL"))
 			 return SURNOM_ALL;
-		 if (msg.contains("NOUVEAU SURNOM POUR"))
-			 return SURNOM;
-		 if (msg.contains("PARTIE DE DÉS"))
+		if (msg.equals("PARTIE DE DÉS"))
 			 return JOUER;
 		 if (msg.equals("RIEN"))
 			 return RIEN;
-		 if (msg.contains("ÇA VA?") || msg.contains("CA VA ?"))
+		 if (msg.equals("ÇA VA?") || msg.equals("CA VA ?"))
 				return CAVA;
-		if (msg.contains("COMBIEN J'AI?") || msg.equals("COMBIEN J'AI ?"))
+		 if (msg.equals("COMBIEN J'AI?") || msg.equals("COMBIEN J'AI ?"))
 				return ARGENT;
-		if(msg.contains("COMMANDES?") || msg.contains("COMMANDES ?"))
-			return COMMANDES;
-		if(msg.contains("TU M'AIMES?") || msg.contains("TU M'AIMES ?"))
-			return AMOUR;
-		if (msg.contains("TOUT LES SURNOMS DE"))
+		 if(msg.equals("COMMANDES?") || msg.equals("COMMANDES ?"))
+				return COMMANDES;
+		 if(msg.equals("TU M'AIMES?") || msg.equals("TU M'AIMES ?"))
+				return AMOUR;
+		 //BEGIN WITH
+		if (msg.startsWith("DIS À"))
+			return MESSAGE;
+		if (msg.startsWith("IL N'Y A PERSONNE?"))
+			return PERSONNE;
+		 if (msg.startsWith("NOUVEAU SURNOM POUR"))
+			 return SURNOM;
+		if (msg.startsWith("TOUT LES SURNOMS DE"))
 			return ALLSURNAME;
-		if(msg.contains("JE TE DONNE"))
+		if(msg.startsWith("JE TE DONNE"))
 			return CADEAU;
 		
-		
+		//PARTICULAR
 		if(isGreeting(msg, mode))
 			return BONJOUR;		
 		if (msg.endsWith("?"))
@@ -56,16 +60,14 @@ public enum Command{
 	public static boolean isCommand(String str, ChannelInstance instance){
 		Command cmd = getCommand(str, new Mode(0));
 		
-		if( cmd == null)
-			return false;
+		if (interpelation(str))
+			return true;
 		
 		int i = new Random().nextInt(100);
 		//Commandes ne nécessitant pas d'interpelation
 		if( (cmd == TRISTE && i > 50) || cmd == INTERPEL || cmd == PERSONNE || cmd == TOURNES || (cmd == BONJOUR && !instance.greated) )
 			return true;
-		
-		if (interpelation(str))
-			return true;		
+
 		
 		return false;
 	}
@@ -73,14 +75,33 @@ public enum Command{
 	private static boolean interpelation(String msg) {
 		String token = "";
 		StringTokenizer tk = new StringTokenizer(msg.toUpperCase());
-		while (tk.hasMoreTokens()) {
+		if (tk.hasMoreTokens()) {
 			token = tk.nextToken();
 			if (token.equals("NADA") || token.equals("NADA,"))
 				return true;
 			if (token.equals("NUHADA")|| token.equals("NUHADA,"))
 				return true;
+			if(token.equals("NA!")|| token.equals("NA!,"))
+				return true;
 		}
 		return false;
+	}
+	
+	private static String withoutInterpelation(String msg){
+		String result = "";
+		String token = "";
+		StringTokenizer tk = new StringTokenizer(msg.toUpperCase());
+		while (tk.hasMoreTokens()) {
+			token = tk.nextToken();
+			if (token.equals("NADA") || token.equals("NADA,"))
+				continue;
+			if (token.equals("NUHADA")|| token.equals("NUHADA,"))
+				continue;
+			if(token.equals("NA!")|| token.equals("NA!,"))
+				continue;
+			result += token+ " ";
+		}
+		return result;
 	}
 	
 	public static boolean interpelationOnly(String str) {
@@ -89,20 +110,26 @@ public enum Command{
 			return true;
 		if (msg.equals("NUHADA"))
 			return true;
+		if (msg.equals("NA!"))
+			return true;
 
 		if (msg.equals("NADA!"))
 			return true;
 		if (msg.equals("NUHADA!"))
-			return true;
+			return true;		
 
 		if (msg.equals("NADA?"))
 			return true;
 		if (msg.equals("NUHADA?"))
 			return true;
+		if (msg.equals("NA!?"))
+			return true;
 
 		if (msg.equals("NADA ?"))
 			return true;
 		if (msg.equals("NUHADA ?"))
+			return true;
+		if (msg.equals("NA! ?"))
 			return true;
 
 		if (msg.equals("NADA !"))
@@ -113,6 +140,8 @@ public enum Command{
 		if (msg.equals("NADA,"))
 			return true;
 		if (msg.equals("NUHADA,"))
+			return true;
+		if (msg.equals("NA!,"))
 			return true;
 		
 		return false;
