@@ -11,7 +11,9 @@ import channelinstance.Absence;
 import channelinstance.Asking;
 import channelinstance.Asking.AskType;
 import data.Affinity;
+import item.InventoryManager;
 import item.Item;
+import item.Item.ItemType;
 import channelinstance.ChannelInstance;
 import channelinstance.MessageForYou;
 import jeux.DesFurieux;
@@ -87,6 +89,13 @@ public abstract class Answers {
 			break;
 		}
 		
+		Random rand = new Random();
+		if(rand.nextInt(100) > 90){
+			ItemType[] except = new ItemType[] {ItemType.ARGENT};
+			Item item = Item.getRdmItemExcept(except);
+			answer += "\n" + replaceTag(Sentences.CADEAU_TROP_ITEM, item );
+			InventoryManager.addItem(item, author.getId());
+		}
 		
 		return answer;
 	}
@@ -433,12 +442,13 @@ public abstract class Answers {
 	//case cadeau
 	private static String cadeau(String content, User author){
 		String cadeau = searchSentenceAfter(content, "DONNE", null);
-		Item item = Item.decodeItem(cadeau);
-		
+		Item item = Item.decodeItem(cadeau);		
 		if(item == null){
 			Affinity.changeAfinity(-2, author.getId());
 			return Sentences.CADEAU_INEXIST;
 		}
+		if(InventoryManager.getItem(author.getId(), item) == null)
+			return Sentences.CADEAU_HAVENOT;
 		
 		return replaceTag(Item.cadeauItemFrom(item, author.getId()), author);
 	}

@@ -5,6 +5,7 @@ import javax.security.auth.login.LoginException;
 import data.Affinity;
 import data.Bank;
 import data.SurnameStorage;
+import item.InventoryManager;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -25,6 +26,7 @@ public class NadaBot {
 		SurnameStorage.initSurnmae();
 		Affinity.initAfinity();
 		Bank.initBank();
+		InventoryManager.init();
 
 		try {
 			jda = new JDABuilder(AccountType.BOT).setToken(token).buildBlocking();

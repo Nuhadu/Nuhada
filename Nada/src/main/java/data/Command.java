@@ -99,7 +99,9 @@ public enum Command{
 				continue;
 			if(token.equals("NA!")|| token.equals("NA!,"))
 				continue;
-			result += token+ " ";
+			if(!result.equals(""))
+				result += " ";
+			result += token;
 		}
 		return result;
 	}

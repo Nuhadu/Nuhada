@@ -1,7 +1,10 @@
 package item;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.StringTokenizer;
+
+import org.json.JSONObject;
 
 import Main.Mode;
 import data.Affinity;
@@ -20,6 +23,21 @@ public class Item {
 	
 	private Item(ItemType type){
 		this(type,0);
+	}
+	
+	public static Item fromJson(String key, JSONObject json){
+		ItemType type = ItemType.valueOf(key);
+		int quantity = json.getInt("quantity");
+		if(type == null)
+			return null;
+		return new Item(type, quantity);
+	}
+	
+	public JSONObject toJson(){
+		JSONObject json = new JSONObject();
+		json.put("type", this.type.toString());
+		json.put("quantity",this.quantity);
+		return json;
 	}
 	
 	public static Item decodeItem(String str){
@@ -75,16 +93,19 @@ public class Item {
 			switch(item.getType()){
 			case ARGENT :
 					if(Bank.retire(item.quantity, authorId))
-						Affinity.changeAfinity(item.quantity*2, authorId);
+						Affinity.changeAfinity(item.quantity*3, authorId);
 					else
 						return Sentences.ARGENT_MOQUE;
 				break;
-			case POMME:
-				Affinity.changeAfinity(1, authorId);
+			case POMME:				
+				if( !InventoryManager.retireItem(new Item(ItemType.POMME, 1), authorId) )
+					return Sentences.CADEAU_HAVENOT;
+				Affinity.changeAfinity(2, authorId);
 				if( item.quantity > 1)
 					str += " " +Sentences.PREND_UNIQUEF_NADA + "\n" + Sentences.EAT_POMME_NADA;
 				else				
 					str += "\n" + Sentences.EAT_POMME_NADA;
+				
 				break;
 			}
 		return str;
@@ -96,7 +117,7 @@ public class Item {
 			Bank.retire(-quantity, authorId);
 			break;
 		case POMME:
-			//nothing for the time being
+			InventoryManager.addItem(new Item(ItemType.POMME, 1), authorId);
 			break;
 				
 		}
@@ -110,14 +131,24 @@ public class Item {
 		return new Item(ItemType.getRdmType(), 1);
 	}
 	
-	
-	private void setQuantity(int i) {
-		quantity = i;
+	public static Item getRdmItemExcept(ItemType[] types){
+		assert(types.length < ItemType.values().length);
+		
+		Item item = getRdmItem();
+		
+		for(ItemType type : types)
+			if(item.getType() == type)
+				return getRdmItemExcept(types);
+		
+		return item;
 	}
 	
-	private ItemType getType(){
-		return this.type;
-	}
+	
+	public void retire(int i) {quantity -= i;}
+	
+	public int getQuantity(){return quantity;}
+	
+	public ItemType getType(){return this.type;}
 	
 	public enum ItemType{
 		ARGENT ("qual", "quals"), POMME ("pomme", "pommes");
@@ -141,11 +172,6 @@ public class Item {
 		public static boolean isType(String str, ItemType type){
 			String msg = str.toUpperCase();
 			return (msg.equals(type.name.toUpperCase()) || msg.equals(type.pluriel.toUpperCase()));
-		}
-		
-		@Override
-		public String toString(){
-			return name;
 		}
 		
 		public String toString(int quantity){
