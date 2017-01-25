@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.StringTokenizer;
 import Main.Mode;
+import Main.NadaBot;
 import channelinstance.Absence;
 import channelinstance.Asking;
 import channelinstance.Asking.AskType;
@@ -288,10 +289,16 @@ public abstract class Answers {
 	
 	//CASE MESSAGE
 	private static String messageTo(List<User> dests, ChannelInstance instance, User author, String content){
-			if (dests.size() != 1)
-				return getRdmSentence(Sentences.DEST_TROP, author);			
-			User dest = dests.get(0);
-			String sentence = searchSentenceAfter(content, "À", dest);
+			User dest = null;
+			if (dests.size() > 1)
+				return getRdmSentence(Sentences.TAB_DEST_TROP, author);	
+			if(dests.size() == 0){
+				return Sentences.DEST_NONE;
+			}
+			else
+				dest = dests.get(0);				
+			
+			String sentence = searchSentenceAfter(content, "À", dest.getName());
 			instance.messages.put(dest, new MessageForYou(author, sentence));
 			return Sentences.MESSAGE_OK;
 	}
@@ -315,25 +322,35 @@ public abstract class Answers {
 	private static String question(User author){
 		if(	author.getId().equals("147045778542690304") )
 			return Sentences.ASKED_INEXIST_THIB;
-		return getRdmSentence(Sentences.ASKED_INEXIST, author);
+		return getRdmSentence(Sentences.TAB_ASKED_INEXIST, author);
 	}
 	
 	//CASE SURNOM
 	private static String surnom(List<User> dests, String content, User author){
+		User dest = null;
+		String surnom = null;
 		if(dests == null){//ALL
-			String surnom = searchSentenceAfter(content, "ALL", null);
+			surnom = searchSentenceAfter(content, "ALL", null);
 			SurnameStorage.addSurname(surnom, "ALL");
-		}
-		else{ //User
-			if (dests.size() > 1)
-				return getRdmSentence(Sentences.DEST_TROP, author);
-			else if(dests.size() == 0)
+		}		
+		else if (dests.size() > 1)
+			return getRdmSentence(Sentences.TAB_DEST_TROP, author);
+		else if(dests.size() == 0){
+			String user = identifyUserName(content);
+			dest = NadaBot.findMate(user, author);
+			if(dest == null)
 				return Sentences.DEST_NONE;
-			
-			User dest = dests.get(0);
-			String surnom = searchSentenceAfter(content, "POUR", dest);
-			SurnameStorage.addSurname(surnom, dest.getId());
+			else{
+				
+				surnom = searchSentenceAfter(content, "POUR", user);
+			}
+		} else{
+			dest = dests.get(0);
+			surnom = searchSentenceAfter(content, "POUR", dest.getName());
 		}
+		
+		
+		SurnameStorage.addSurname(surnom, dest.getId());
 		
 		return Sentences.SURNOM_OK;
 	}
@@ -394,7 +411,7 @@ public abstract class Answers {
 	//case TOUT LES SURNOMS DE:
 	private static String allSurnameOf(List<User> dests, User author){
 		if (dests.size() > 1)
-				return getRdmSentence(Sentences.DEST_TROP, author);
+				return getRdmSentence(Sentences.TAB_DEST_TROP, author);
 		else if (dests.size() == 0)
 				return Sentences.DEST_NONE;
 		
@@ -432,7 +449,7 @@ public abstract class Answers {
 		Random rand = new Random();
 		if (rand.nextInt(100) > 20) {
 			instance.askings.put(author, new Asking(author, AskType.INTERPEL));
-			return getRdmSentence(Sentences.ANSWER_INTERPEL, author);
+			return getRdmSentence(Sentences.TAB_ANSWER_INTERPEL, author);
 		} else {
 			if (author.getName().toUpperCase().equals("FENARO07")) {
 				instance.askings.put(author, new Asking(author, AskType.QUESTION, "FENARO"));
@@ -485,23 +502,23 @@ public abstract class Answers {
 		if (mode.i != 0 && heure != mode.i) {
 			switch (mode.i) {
 			case -1:
-				msg = getRdmSentence(Sentences.GREETING_NOT_SOIR, author);
+				msg = getRdmSentence(Sentences.TAB_GREETING_NOT_SOIR, author);
 				break;
 			case 1:
-				msg = getRdmSentence(Sentences.GREETING_NOT_JOUR, author);
+				msg = getRdmSentence(Sentences.TAB_GREETING_NOT_JOUR, author);
 			}
 
 			msg += Sentences.GREETINGBACK_MENFIN;
 		} else {
 			switch (heure) {
 			case -1:
-				msg = getRdmSentence(Sentences.GREETING_SOIR, author);
+				msg = getRdmSentence(Sentences.TAB_GREETING_SOIR, author);
 				break;
 			case 0:
-				msg = getRdmSentence(Sentences.GREETING_NOPE, author);
+				msg = getRdmSentence(Sentences.TAB_GREETING_NOPE, author);
 				break;
 			case 1:
-				msg = getRdmSentence(Sentences.GREETING_JOUR, author);
+				msg = getRdmSentence(Sentences.TAB_GREETING_JOUR, author);
 			}
 		}
 		return msg;
@@ -555,7 +572,7 @@ public abstract class Answers {
 		return str;
 	}
 	
-	public static String searchSentenceAfter(String message, String lastWord, User tag) {
+	public static String searchSentenceAfter(String message, String lastWord, String tag) {
 		StringTokenizer st = new StringTokenizer(message);
 		String token = "";
 		// on avance jusqu'au dernier mot
@@ -565,7 +582,7 @@ public abstract class Answers {
 
 		// on passe le nom s'il y en a un
 		if (tag != null) {
-			StringTokenizer st2 = new StringTokenizer(tag.getName());
+			StringTokenizer st2 = new StringTokenizer(tag);
 			for (int i = 0; i < st2.countTokens() && st.hasMoreTokens(); i++) {
 				st.nextToken();
 			}
@@ -574,10 +591,24 @@ public abstract class Answers {
 		// on rassemble le reste.
 		token = "";
 		while (st.hasMoreTokens()) {
-			token += st.nextToken() + " ";
+			if(!token.equals(""))
+				token += " ";
+			token += st.nextToken();
 		}
 
 		return token;
+	}
+	
+	public static String identifyUserName(String message){
+		StringTokenizer st = new StringTokenizer(message);
+		String token = "";
+		while(st.hasMoreTokens() && !token.startsWith("@"))
+			token = st.nextToken();
+		String user = token;
+		while(st.hasMoreTokens() && !token.contains("#"))
+			user += " " + token;
+		
+		return user;
 	}
 	
 	public static String messageFor(User dest, MessageForYou msg){

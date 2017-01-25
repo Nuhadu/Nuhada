@@ -9,11 +9,14 @@ import item.InventoryManager;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 
 public class NadaBot {
 
-	private JDA jda;
+	private static JDA jda;
 
 	public static void main(String[] args) {
 		if (args.length < 1) {
@@ -41,6 +44,23 @@ public class NadaBot {
 		}
 
 		jda.addEventListener(new MessageListener());
+	}
+	
+	public static User findMate(String user, User author){
+		User found = null;
+		if(jda != null){
+			for( Guild g : jda.getGuilds()){
+				if( g.isMember(author) )
+					for( Member m : g.getMembers()){
+						if(user.contains(m.getUser().getDiscriminator())){
+							return m.getUser();
+						}
+					}
+			}
+		}
+
+		
+		return found;
 	}
 
 }

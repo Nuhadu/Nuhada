@@ -33,7 +33,7 @@ public class MessageListener extends ListenerAdapter {
 		if (channelInstances.get(channel) == null)
 			channelInstances.put(channel, new ChannelInstance());
 
-		toLog(author, msg, channel);
+		toLog(author, msg, channel, event.isFromType(ChannelType.PRIVATE));
 		
 		if (!event.getAuthor().isBot()) {
 			//MESSAGE FOR YOU?
@@ -57,8 +57,8 @@ public class MessageListener extends ListenerAdapter {
 		}
 	}
 	
-	private void toLog(User author, Message msg, TextChannel channel){
-		if (channel.getType() == ChannelType.PRIVATE) {
+	private void toLog(User author, Message msg, TextChannel channel, boolean isPrivate){
+		if (isPrivate) {
 			System.out.printf("[PM] %s: %s\n", author.getName(), msg.getContent());			
 		} else {
 			System.out.printf("[%s][%s] %s: %s\n", channel.getGuild().getName(), channel.getName(),
