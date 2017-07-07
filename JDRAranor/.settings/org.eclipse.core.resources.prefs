@@ -1,0 +1,12 @@
+eclipse.preferences.version=1
+encoding//src/main/java/jdraranor/JDRAranorEngine.java=UTF-8
+encoding//src/main/java/jdraranor/combat/Combat.java=UTF-8
+encoding//src/main/java/jdraranor/command/action/AvancerVoyageAction.java=UTF-8
+encoding//src/main/java/jdraranor/command/action/VoyageAction.java=UTF-8
+encoding//src/main/java/jdraranor/geographie/JDRMonde.java=UTF-8
+encoding//src/main/java/jdraranor/geographie/JDRNode.java=UTF-8
+encoding//src/main/java/jdraranor/geographie/JDRVoyage.java=UTF-8
+encoding//src/main/java/jdraranor/jdrchannel/AccueilChannel.java=UTF-8
+encoding//src/main/java/jdraranor/jdrchannel/JDRAsking.java=UTF-8
+encoding//src/main/java/jdraranor/jdrchannel/JDRChannel.java=UTF-8
+encoding//src/main/java/jdraranor/jdrchannel/PersoChannel.java=UTF-8
