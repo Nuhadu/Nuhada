@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
-encoding//src/main/java/command/CreateSessionCommand.java=UTF-8
-encoding//src/main/java/command/JoinSessionCommand.java=UTF-8
-encoding//src/main/java/command/SearchSessionCommand.java=UTF-8
+encoding//src/main/java/character/role/CreatePersoCommand.java=UTF-8
+encoding//src/main/java/session/CreateSessionCommand.java=UTF-8
+encoding//src/main/java/session/JoinSessionCommand.java=UTF-8
+encoding//src/main/java/session/SearchSessionCommand.java=UTF-8

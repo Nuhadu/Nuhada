@@ -1,8 +1,9 @@
-package general;
+package session;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import character.role.Role.RoleName;
 import net.dv8tion.jda.core.entities.User;
 
 public class Session {
@@ -13,13 +14,20 @@ public class Session {
 	private User creator;
 	private ArrayList<User> participants;
 	
+	private HashMap<RoleName, ArrayList<User>> byRoles;
+	
 	public static void createSession(User u, String name){
 		new Session(u, name);
 	}
 	
 	public static boolean joinSession(User u, String name){
-		list.get(name).addPlayer(u);
+		if( !list.containsKey(name) )
+			return false;
 		
+		if( list.get(name).participants.size() > 14 )
+			return false;
+		
+		list.get(name).addPlayer(u);
 		return true;
 	}
 	
@@ -34,11 +42,39 @@ public class Session {
 		list.put(name, this);
 		participants = new ArrayList<>();
 		participants.add(u);
+		byRoles = new HashMap<>();
+		for(RoleName r : RoleName.values()) {
+			byRoles.put(r, new ArrayList<User>() );
+		}
 	}
 	
 	
 	public void addPlayer(User u){
 		participants.add(u);
+	}
+	
+	/**
+	 * Return the role of the player, witch can be the one he has chosen if there are places available.
+	 * @param r
+	 * @return
+	 */
+	public RoleName obtainRole( RoleName r) {
+		ArrayList<User> servants = byRoles.get(RoleName.SERVANT);
+		ArrayList<User> masters = byRoles.get(RoleName.MASTER);
+		
+		if(servants.size() == 7)
+			return RoleName.MASTER;
+		if(masters.size() == 7 )
+			return RoleName.SERVANT;
+		
+		if( r == null ){// hasard
+			if( servants.size() <= masters.size() )
+				return RoleName.SERVANT;
+			else 
+				return RoleName.MASTER;
+		}
+		
+		return r;
 	}
 	
 	

@@ -1,9 +1,8 @@
-package command;
+package session;
 
 import channel.Asking;
 import channel.UserInstance;
 import commands.Command;
-import general.Session;
 import net.dv8tion.jda.core.entities.Message;
 
 public class CreateSessionCommand extends Command {

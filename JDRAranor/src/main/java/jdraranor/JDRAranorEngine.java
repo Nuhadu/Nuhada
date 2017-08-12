@@ -102,6 +102,7 @@ public class JDRAranorEngine extends ListenerAdapter {
 				channelManagers.get(channel).answer(message, instance);
 		}
 		Log(event.getAuthor(), event.getMessage(), event.getChannel());
+	
 	}
 	
 	public static void launchGame(UserInstance instance, User user){

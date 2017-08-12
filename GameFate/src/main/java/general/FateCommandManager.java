@@ -2,15 +2,18 @@ package general;
 
 import channel.CommandManager;
 import channel.UserInstance;
-import command.CreateSessionCommand;
-import command.JoinSessionCommand;
-import command.SearchSessionCommand;
+import character.role.CreatePersoCommand;
 import net.dv8tion.jda.core.entities.User;
+import session.CreateSessionCommand;
+import session.JoinSessionCommand;
+import session.SearchSessionCommand;
+import session.Session;
 
 public class FateCommandManager extends CommandManager {
 
 	private Session session;
 	private UserInstance userInstance;
+	private Character character;
 	
 	/**
 	 * Constructor to keep access to the session
@@ -44,6 +47,9 @@ public class FateCommandManager extends CommandManager {
 			commands.remove(SearchSessionCommand.ID);
 			commands.remove(JoinSessionCommand.ID);
 			commands.remove(CreateSessionCommand.ID);
+			if( character == null) {
+				commands.put(CreatePersoCommand.ID, new CreatePersoCommand(this, session));
+			}
 		}
 	}
 

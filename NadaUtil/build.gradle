@@ -2,7 +2,10 @@ apply plugin: 'java'
 
 dependencies {
   compile 'net.dv8tion:JDA:3.0.BETA2_108'
+  compile 'com.sedmelluq:lavaplayer:1.2.42'
 }
+
+
 
 repositories {
   jcenter()
